@@ -1,2 +1,2 @@
 # codegurubyteme
-ByteMe team repo
+ByteMe CodeGuru FTW!
