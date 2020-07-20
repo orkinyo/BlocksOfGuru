@@ -13,7 +13,7 @@ mov si,ax
 
 ;;write magicseg to the loc after the label @copy_end
 and ax,0xf ;; 0<=ax<=0xf
-add ax, 0xff6 ;; 0xff6 <= ax <= 0x1005
+add ax, 0xff5 ;; 0xff6 <= ax <= 0x1004
 mov [si+@copy_end],ax	
 
 ;;ax = first callfar place
@@ -76,13 +76,13 @@ les di,[bx]				;; di = callfar address
 
 add sp,[bx+si]			;; change sp adress relative to next callfar address (sp += deltaSp)
 
+mov cl,(@end_loop_section - @loop_section)/0x2			;; reset counter for next time we execute "rep movsw" 
+
 movsw					;; write callfar in the next address (address = [bx] = di)
 
 dec di					;; dx = [bx] + 0x1 (address of callfar + 0x1)
 
 xor si,si				;; reset si (si = 0x0000)
-
-mov cl,(@end_loop_section - @loop_section)/0x2			;; reset counter for next time we execute "rep movsw" 
 
 dec bp 					;;counter for zoms
 

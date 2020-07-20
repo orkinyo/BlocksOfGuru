@@ -18,7 +18,7 @@
 
 %define repDist 0x2*repAmount
 %define trueInterval antiInterval-0x4
-%define startSp (0x10000-(interval*antiAmount))%0x10000
+%define startSp (0x10000-(antiInterval *antiAmount))%(0x10000)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;CONST-DEFINES;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -38,15 +38,15 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;HELPER-FUNCTIONS;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-def calc_start_sp(interval, antiAmount):
-    sp = 0x10000-interval
-    count = 1
-    while count != antiAmount:
-            if sp<0:
-                    sp += 0x10000
-            sp-= interval
-            count +=1
-    return sp
+;def calc_start_sp(interval, antiAmount):
+;    sp = 0x10000-interval
+;    count = 1
+;    while count != antiAmount:
+;            if sp<0:
+;                    sp += 0x10000
+;            sp-= interval
+;            count +=1
+;    return sp
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;START-OF-CODE;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -6,8 +6,8 @@
 ;; clean comments
 
 %define repAmount 0x100
-%define jumpDist 0x2e00
-%define antiAmount 1500
+%define jumpDist 0x4e00
+%define antiAmount 2
 %define antiInterval 0xf1
 
 %define repDist 0x2*repAmount
