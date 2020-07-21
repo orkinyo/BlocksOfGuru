@@ -12,9 +12,11 @@
 mov si,ax
 
 ;;write magicseg to the loc after the label @copy_end
-and ax,0xf ;; 0<=ax<=0xf
-add ax, 0xff5 ;; 0xff6 <= ax <= 0x1004
-mov [si+@copy_end],ax	
+mov cl,0xf
+div cx ;; dx = reminder
+add dx,0xff6 ;; 0xff6 <= dx <= 0x1005
+
+mov [si+@copy_end],dx	
 
 ;;ax = first callfar place
 lea ax,[si+jumpDist]
@@ -71,21 +73,13 @@ rep movsw				;; write our code
 @loop_section:
 
 add [bx],ax				;; change callfar place (bx += ax)
-
 les di,[bx]				;; di = callfar address				
-
 add sp,[bx+si]			;; change sp adress relative to next callfar address (sp += deltaSp)
-
 mov cl,(@end_loop_section - @loop_section)/0x2			;; reset counter for next time we execute "rep movsw" 
-
 movsw					;; write callfar in the next address (address = [bx] = di)
-
 dec di					;; dx = [bx] + 0x1 (address of callfar + 0x1)
-
 xor si,si				;; reset si (si = 0x0000)
-
 dec bp 					;;counter for zoms
-
 db 0x75  
 						;; 0x75FF -> jnz short 0x1
 db 0xFF					;; this byte is the last byte of "jnz" and first of "callfar"
@@ -94,11 +88,7 @@ db 0x18
 						;; 0x18 -> sbb ah,cl (if pointer reaches here the code will die after this command)
 
 @end_loop_section:
-
 call far [bx+si] 		;; being copied by movsw for next callfar cycle
-
 @copy_end:
-
 dw 0xcccc  			;;for movsw in the beginning 
-
 call far [bx+si]		;; will be the first callfar to run 

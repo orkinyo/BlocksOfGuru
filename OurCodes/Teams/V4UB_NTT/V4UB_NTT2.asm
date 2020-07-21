@@ -10,11 +10,14 @@
 
 %define TRAP 0x47EB
 
+
+mov bx,ax
+
+
 push ss
 pop es ;; es = StackSeg
 
-mov si,ax
-add si, @copy_loader
+lea si,[bx+@copy_loader]
 mov di,0x2+upper_trap_dist + (@end-@loop) + bottom_trap_dist
 mov cl,(@copy_end-@copy_loader)/2
 rep movsw
@@ -22,16 +25,14 @@ rep movsw
 sub si,@copy_end-@loop
 mov cl,(@end-@loop)/2
 rep movsw
-push ax
 mov ax,TRAP
 stosw
 stosw
-pop ax
+
 ;; is [bp+di] in the right place ??
 mov word[bp+di],0x2+upper_trap_dist + (@end-@loop) + bottom_trap_dist
 mov word[bp+di+0x2],cs
 
-mov bx,ax
 mov ax,ss
 push cs
 push ds
@@ -42,13 +43,12 @@ lea cx,[bx+jumpDist]
 mov cl, 0xA4
 ;; shl __,cl -> shl __,0x4 |||| cl = movsb ||| cx = nextjumpPlace
 
-add bx,@loop
-lea sp,[bx+@end]
-sub bx,upper_trap_dist+0x2
-mov dx, interval
-mov word[bx],TRAP
+lea sp,[bx+@loop-0x4]
+mov dx, interval-0x4
+add bx, @loop-upper_trap_dist-0x2
 mov si, 0x2+upper_trap_dist + (@end-@loop) + bottom_trap_dist
-mov word[bx+si],TRAP
+mov word [bx],TRAP
+mov word [bx+si],TRAP
 
 @loop:
 pop di ;; di = ip
