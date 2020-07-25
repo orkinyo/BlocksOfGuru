@@ -20,6 +20,7 @@ VAR_2 = "callAmount"
 MIN_2 = 0x40
 MAX_2 = 0xC0
 DELTA_2 = 0x1
+BATTLES_AMOUNT = 1000
 
 FILE_PATH = os.getcwd()+"\\"+SURV_NAME
 EXCEL_FILENAME = "multi_data.xlsx"
@@ -190,7 +191,7 @@ for v1 in range(MIN_1, MAX_1+1, DELTA_1):
             os.system(f"nasm temp{i}.asm -o ./survivors/{SURV_NAME}{i}")
             
         #run cgx
-        os.system(f"multi.jar")
+        os.system(f"java -jar cgx_silent.jar " + str(BATTLES_AMOUNT))
         
         #wait for engine to finish
         while not os.path.isfile('./scores.csv'):
