@@ -12,7 +12,7 @@
 
 %define repDist 0x2*repAmount
 %define trueInterval antiInterval-0x4
-%define startSp 0xfbe4
+%define startSp (0x10000-(antiInterval *antiAmount))%(0x10000)
 ;; es = StackSeg
 push ss
 pop es
