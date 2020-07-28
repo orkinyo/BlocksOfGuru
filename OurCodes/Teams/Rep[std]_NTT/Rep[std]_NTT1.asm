@@ -9,7 +9,7 @@
 ;; clean comments
 
 %define repAmount 0x100
-%define jumpDist 0x4e00
+%define jumpDist 0x5200 ;; same as shooterA (but no SegChange)
 %define antiAmount 2
 %define antiInterval 0xd01
 
