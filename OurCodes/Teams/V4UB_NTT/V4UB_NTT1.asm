@@ -7,7 +7,7 @@
 %define callDist 0x4 * callAmount											;;distance the callfar loop will bomb on the board
 %define deltaSp jumpDist + callDist										;;the amount sp needs to updated for next loop
 %define deltaSp_loc @end_loop_section-@copy                          	;; the location in es where we store deltaSp (2 is for the 2 bytes of rep movsw)
-
+%define KEY 0xA7F3
 ;; si = ax
 mov si,ax
 
@@ -15,7 +15,7 @@ mov si,ax
 mov cl,0xf
 div cx ;; dx = reminder
 add dx,0xff6 ;; 0xff6 <= dx <= 0x1005
-
+mov [KEY],dx
 mov [si+@copy_end],dx	
 
 ;;ax = first callfar place
