@@ -1,0 +1,24 @@
+** Added features are listed in the patch notes file
+
+- Creating shortcut: to create a desktop shorcut simply right click on the "Tom'sTool_V1.1.jar" file located in the main folder,
+then select send to and press on the create desktop shortcut option.
+
+- Autotuner: choose 1 or 2 files in the Autotuner tab and mark the boxes of the files you would like to autotune, then type the name of the variable
+(if using 2 files variable name must be the same). enter the values on the right hand side (must be decimal values, hex values are not accepted),
+next, go to the codes panel and select the codes you would like to autotune against, then click "Run On Engine" and select the "Autotune" option, enter the amount of wars you would like to run,
+select your prefered settings and click start. You can follow the progress in the "Results" tab.
+
+- All Against One War: choose the codes you would like to run against others in the codes tab and add them to the selected codes (the first team is the team that will be ran against all),
+then select the codes you would like to run against the first team. Click on "Run On Engine" and select the "All Against One" war you would like to run, enter the amount of wars you would like to run per combination, select your prefered
+settings and click start. You can follow the progress in the "Results" tab.
+
+- Auto run: add the codes you would like to run to the selected codes tab, click on "Run On Engine" select the "Auto run" option, then type the amount of wars you would like to run per combination, select your
+prefered settings and click start. You can follow the progress in the "Results" tab.
+
+- Manual run: add the codes to the selected codes tab, and press either "Run On Shooshx" or "Run On Engine", select your prefered settings and click start.
+
+- Adjust ram usage: open the settings folder and click on the "ram_usage.txt" file. After it opens change the amount of ram in the first row
+(the amount of ram MUST be a multiply of 1024, example: 1024, 2048, 3072...) close the file and run the tool.
+
+- Add external folders: open the settings folder and click on the "extra_panels.txt" file. After it opens add or remove a path to a desired folder contaning codes
+(must be a full path, example: C:\Users\MyName\Dir1\Dir2\Dir3, every path MUST be in a new line). Close the file and run the tool.
