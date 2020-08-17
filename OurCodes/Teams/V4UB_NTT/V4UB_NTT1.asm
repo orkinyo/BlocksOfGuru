@@ -16,8 +16,11 @@ mov cl,0xf
 div cx ;; dx = reminder
 add dx,0xff6 ;; 0xff6 <= dx <= 0x1005
 mov [KEY],dx
-mov [si+@copy_end],dx	
-
+mov [si+@copy_end],dx
+sub dx,0x1000
+mov cl,0x4
+shl dx,cl
+add word [si+@add_magic_seg+0x2],dx
 ;;ax = first callfar place
 lea ax,[si+jumpDist]
 mov al,0xA2
@@ -45,9 +48,9 @@ mov word [bx + deltaSp_loc],deltaSp		;; store the value deltaSp in es in some di
 push cs
 pop ds					;; ds = Arena
 			
-movsw					;; write callfar to the address
-
+mov ax,jumpDist			;; ax = jumpDist
 mov cl,(@end_loop_section - @loop_section)/0x2
+movsw					;; write callfar to the address
 dec di					;; di = adr + 0x1
 xor si,si 				
 
@@ -60,7 +63,6 @@ pop ss					;; ss = Arena
 mov sp,[bx]				;; sp = ax = callfar adr
 add sp,callDist			;; sp = ax + calldist
 
-mov ax,jumpDist			;; ax = jumpDist
 
 call far [bx+si]			;; execute callfar
 
@@ -74,7 +76,8 @@ rep movsw				;; write our code
 
 add [bx],ax				;; change callfar place (bx += ax)
 les di,[bx]				;; di = callfar address				
-add sp,[bx+si]			;; change sp adress relative to next callfar address (sp += deltaSp)
+@add_magic_seg:
+lea sp,[di+callDist]
 mov cl,(@end_loop_section - @loop_section)/0x2			;; reset counter for next time we execute "rep movsw" 
 movsw					;; write callfar in the next address (address = [bx] = di)
 dec di					;; dx = [bx] + 0x1 (address of callfar + 0x1)
