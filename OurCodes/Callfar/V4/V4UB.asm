@@ -13,8 +13,8 @@ mov si,ax
 
 ;;write magicseg to the loc after the label @copy_end
 mov cl,0xf
-div cx ;; dx = reminder
-add dx,0xff6 ;; 0xff6 <= dx <= 0x1005
+div cx ;; dx = 0x0 <= reminder <= 0xe
+add dx,0xff6 ;; 0xff6 <= dx <= 0x1004
 
 mov [si+@copy_end],dx	
 
