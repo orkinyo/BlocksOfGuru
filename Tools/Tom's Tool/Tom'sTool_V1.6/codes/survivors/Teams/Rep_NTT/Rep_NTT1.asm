@@ -1,0 +1,103 @@
+;;rfnt(std)_NTT
+
+;; rep (std) + zomb counter (bp) + FSM (anti)
+
+
+;;todo:
+;; make code more efficient
+;; make define for amount of jump in fsm part
+;; clean comments
+
+%define repAmount 0x100
+%define jumpDist 0x5200 ;; same as shooterA (but no SegChange)
+%define antiAmount 2
+%define antiInterval 0xd01
+
+%define repDist 0x2*repAmount
+%define trueInterval antiInterval-0x4
+%define startSp (0x10000-(antiInterval *antiAmount))%(0x10000)
+%define KEY 0xB9B2
+
+mov word [KEY],ax
+;; es = StackSeg
+push ss
+pop es
+
+;;copy repmovsw+reser_code to es:0x0
+mov si,ax
+add si,@copy
+mov cl, (@reset_loop_end-@reset_loop)/2 + 0x1
+rep movsw
+;; write 0xeb0e into es
+mov bx,ax
+mov ax,0xcccc
+mov dx,ax
+int 0x86
+int 0x86
+;; write nop and anti part
+std
+
+;; es = Arena, ds = StackSeg
+push ds
+push es
+pop ds
+pop es
+;; write repmovsw in Arena
+add bx, jumpDist ;; bx = repmovsw loc
+mov di, bx
+xor si,si
+movsw
+;; prepare for REP
+add di,repDist + 0x2;; - 0x1 ;; fo/e
+mov cx,repAmount+0x1
+mov ax,repDist + 0x2;; - 0x1 ;; fo/e
+mov sp,jumpDist
+mov dx,repAmount+0x1
+mov si, repDist+0x2
+jmp bx
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+@copy:
+rep movsw
+@reset_loop:
+add bx, sp ;; sp = jumpDist
+mov di,bx
+movsw
+mov si, repDist+0x2
+add di, ax ;; ax = repDist + 0x2 - 0x1
+mov cx, dx ;; dx = repAmount + (@reset_loop_end-@reset_loop)/0x2
+dec bp
+db 0x75
+		;; 0x75ff - jnz short 0xff
+db 0xff
+		;; 0xffe3 - jmp bx
+db 0xe3
+@reset_loop_end:
+;;;; tons of 0xeb0e
+;;;; lots of nops
+@anti:
+;;prepare for anti_loop
+
+push cs
+pop ss
+push cs
+pop ds
+mov cx, 0xce04 ;; cl = 0x4, ch = 0xce (illegal opcode)
+mov es,cx ;; in order to make sure suicide will work
+mov sp,startSp
+mov dx, trueInterval
+@anti_loop:
+pop di ;; di = ip
+pop bp ;; bp = seg
+shl bp,cl ;; bp = 0x10*seg
+mov [bp+di-0x2],cx ;; bomb 0x10*seg+ip-0x2
+add sp,dx 
+jnz @anti_loop ;; when sp==0 suicide will happen
+dw 0xcccc
+@anti_end:
+
+@copy_end:

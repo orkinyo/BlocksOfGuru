@@ -1,0 +1,12 @@
+Added Features
+	
+	- NEW DARK MODE!!!	
+	- More precise precentage bar	
+
+Bug Fixes
+	
+	- Fixed autotuner
+	- Fixed 1v3 run
+	- Fixed 1v2 run
+	- Fixed 1v1 run
+	- Fixed 1vFolders run	
