@@ -8,7 +8,7 @@
 ;; do not change if not necessary
 %define topShieldGap 0x1A6
 %define bottomShieldGap 0x2F0
-%define trueJumpDist jumpDist - 0x56
+%define trueJumpDist jumpDist - 0x5C
 
 ;; copy code to StackSeg
 mov si,topShieldGap + trueJumpDist
@@ -17,15 +17,17 @@ xchg ax,si ;; ax = distShit, si = loc
 push ss
 pop es
 mov cl,(@copy_end-@copy_loader)/2
+movsb
 rep movsw
 push ds
 pop es
 
 mov bx,oneShieldLen
-
+mov dx,((@anti_end-@anti_start)/2)*0x100+oneShieldLen/2
 mov bp,di
-mov [bp],ss
-lea dx,[si+topShieldGap + trueJumpDist]
+mov [bp],si
+add [bp],ax ;; [bp] = jmpLoc
+mov word [bp+0x2],ss
 mov word [bp+0x4],bottomShieldGap
 mov word [bp+0x6], oneShieldLen + bottomShieldGap + (@copy_end-@loop_start) + topShieldGap + oneShieldLen
 mov word [bp+0x8], bx
@@ -33,9 +35,7 @@ mov word [bp+0xA], cs
 mov word [bp+0xC],sp
 mov word [bp+0xE], oneShieldLen+ topShieldGap + (@copy_end-@loop_start) + bottomShieldGap
 
-xchg dx,ax ;; dx = distShit, ax = nextJumpLoc
-lds di,[bp-0x2]
-mov di,ax
+lds di,[bp]
 mov si,@anti_end-@copy_loader
 push di
 movsw
@@ -44,11 +44,11 @@ ret
 @copy_loader:
 movsw
 movsw
-mov cl,((@anti_end-@anti_start)/2)
+mov cl,dh
 rep movsw
 @copy_start:
 @anti_start:
-xchg di,ax
+xchg di,[bp]
 sub di,0x2
 scasw
 jnz @inUpper
@@ -67,9 +67,9 @@ sub sp,0x3
 dec ch
 jnz @anti_loop
 push ds
-pop ss ;; mov ss,[bx+si]
-mov bp,(@copy_end-@copy_loader)
-xchg di,ax
+pop ss
+mov bp,(@copy_end-@copy_loader)+0x1
+xchg di,[bp]
 mov si,0x6+@anti_end-@anti_start
 mov sp,[bp+0xC]
 movsw
@@ -78,40 +78,38 @@ movsw
 movsw
 mov cl,(@copy_end-@copy_truely_start)/2
 movsw 
-movsw
-rep movsw
+rep movsw ;; ????
 @copy_truely_start:
 ;; write bottom shield
 add di,[bp+0x4] ;;bottomShieldGap
-mov cl,oneShieldLen/2
+mov cl,dl
 rep stosw
 
 mov si,di
 
 ;; di = top shield start location
 sub di,[bp+0x6];;oneShieldLen + bottomShieldGap + (@copy_end-@loop_start) + topShieldGap + oneShieldLen
-mov cl,oneShieldLen/2
+mov cl,dl
 rep stosw
 
-add di,dx; topShieldGap + trueJumpDist
+add di,ax; topShieldGap + trueJumpDist
 
-mov ax,di
-push ax
+mov [bp],di
+push word [bp]
 push cx
 
-sub di,dx
+sub di,ax
 lds bx,[bp+0x8]
 @loop_start:
 sub di,bx
 sub si,bx
-mov cl,oneShieldLen/2
+mov cl,dl
 repe cmpsw
 jz short @loop_start
 
 pop si ;; si = 0
-mov ds,[bp+si]
-xchg di,ax
+mov ds,[bp+si+0x2]
+xchg di,[bp+si]
 movsw
 retn
 @copy_end:
-
