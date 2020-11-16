@@ -1,8 +1,8 @@
 ;; V4U - Callfar V4 - Best in class
 ;; V4UB - added movsb instead of movsw (kills better)
 
-%define jumpDist 0x2E00
-%define callAmount 0x80
+%define jumpDist 0x5200
+%define callAmount 0x84
 
 %define callDist 0x4 * callAmount											;;distance the callfar loop will bomb on the board
 %define deltaSp jumpDist + callDist										;;the amount sp needs to updated for next loop
