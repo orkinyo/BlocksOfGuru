@@ -5,7 +5,7 @@
 %define addsp jumpDist+calldist
 %define copyloop ((@loop_end-@loop)/0x2)
 %define copystart ((@copy_end-@copy)/0x2)
-%define deltaSp_loc (copyloop*0x2 + 0x2) ;; + 0x2 because of rep movsw
+%define deltaSp_loc (copyloop*0x2) ;; + 0x2 because of rep movsw
 
 
 ;mov ax,calldist
@@ -25,7 +25,7 @@ add dx,0xff6
 push ss					;; push ss value to stack
 pop ds					;; ds = StackSeg
 
-mov al,0xA1				;; ax = closest location ending in 0xA3
+mov al,0xA7				;; ax = closest location ending in 0xA3
 
 mov bx,di		;; bx = location of where we read call far address
 stosw 			;; [bx] = address of call far
@@ -59,16 +59,15 @@ add sp,calldist
 ;; - 0x2 because we want to write from start of call far, not add sp,dx
 ;; - 0x4 because call far is first and last to execute
 
-mov ax,jumpDist
+mov ax,0xA5F3
 mov dx,gap
 call far [bx+si]			;; execute call far
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;; END OF REGULAR CODE
 
-@copy:
-rep movsw				;; write our code
+@copy:				;; write our code
 @loop:
-sub [bx],ax	;; change call far place (bx -= ax)
+sub word [bx],jumpDist	;; change call far place (bx -= ax)
 
 les di,[bx]				;; di = call far address				
 

@@ -1,8 +1,7 @@
 %define jumpDist 0x2000
 %define callAmount 201
 %define gap 0x2B
-%define calldist ((callAmount * (gap+0x4)) + 0x4)
-%define addsp jumpDist+calldist
+%define calldist ((callAmount * (gap+0x4)) + 0x2)
 %define copyloop ((@loop_end-@loop)/0x2)
 %define copystart ((@copy_end-@copy)/0x2)
 %define deltaSp_loc (copyloop*0x2 + 0x2) ;; + 0x2 because of rep movsw
@@ -21,16 +20,19 @@ mov cl,0xf
 div cx ;; dx
 add dx,0xff6
 				;; copy code to ES (where SS is)
+mov [0x9898],ax
 
 push ss					;; push ss value to stack
 pop ds					;; ds = StackSeg
 
 mov al,0xA1				;; ax = closest location ending in 0xA3
+nop
+nop
 
 mov bx,di		;; bx = location of where we read call far address
 stosw 			;; [bx] = address of call far
 mov word [di],dx 	;; [bx+0x2] segment of call far
-mov word [bx+deltaSp_loc],(jumpDist-calldist)
+mov word [bx+deltaSp_loc],(jumpDist-calldist)+0x2
 
 les di,[bx]				;; di = ax, es = magicseg
 
@@ -44,7 +46,7 @@ movsw					;; write call far to the address
 movsw
 
 mov cl,copyloop 		;; cx = 0x00words
-sub di,0x3
+dec di
 xor si,si 				;; si = 0x0000
 
 push ss					;; push ss value to stack
@@ -55,7 +57,7 @@ pop ss
 
 mov sp,[bx]
 add sp,dx
-add sp,calldist		
+add sp,calldist-gap
 ;; - 0x2 because we want to write from start of call far, not add sp,dx
 ;; - 0x4 because call far is first and last to execute
 
@@ -82,7 +84,7 @@ movsw					;; write call far in the next address (address = [bx] = di)
 
 movsw
 
-sub di,0x3					;; dx = [bx] + 0x1 (address of call far + 0x1)
+dec di					;; dx = [bx] + 0x1 (address of call far + 0x1)
 
 xor si,si				;; reset si (si = 0x0000)
 
