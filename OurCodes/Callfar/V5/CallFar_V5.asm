@@ -1,4 +1,4 @@
-%define jumpDist 0x5200
+%define jumpDist 0x0800
 %define callAmount 51
 %define gap 0x6
 %define calldist ((callAmount * (gap+0x4)) + 0x4)
@@ -37,7 +37,8 @@ les di,[bx]				;; di = ax, es = magicseg
 push cs				 	;; put value of cs in stack
 pop ds					;; ds = Arena
 
-mov dx,gap
+mov cl,0x4
+shl dx,cl
 
 movsw					;; write call far to the address
 movsw
@@ -49,15 +50,17 @@ xor si,si 				;; si = 0x0000
 push ss					;; push ss value to stack
 pop ds					;; ds = StackSeg
 
-mov ss,[bx+0x2]
+push cs
+pop ss
 
 mov sp,[bx]
+add sp,dx
 add sp,calldist		
 ;; - 0x2 because we want to write from start of call far, not add sp,dx
 ;; - 0x4 because call far is first and last to execute
 
 mov ax,jumpDist
-
+mov dx,gap
 call far [bx+si]			;; execute call far
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;; END OF REGULAR CODE
