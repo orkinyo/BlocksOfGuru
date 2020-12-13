@@ -1,0 +1,1 @@
+java -jar omega_cgx.jar -h
