@@ -6,6 +6,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="C:/Users/Tom/Documents/GitHub/codegurubyteme/Resources/BlocksOfGuru/lib/commons-math3-3.4.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Tom/Documents/GitHub/codegurubyteme/Resources/BlocksOfGuruSourceCode/lib/commons-math3-3.4.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

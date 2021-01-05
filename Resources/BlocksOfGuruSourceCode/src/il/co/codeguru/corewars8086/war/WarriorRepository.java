@@ -230,19 +230,19 @@ public class WarriorRepository
     	// $BOG
     	if(outputStdout)
     	{
-    		System.out.println("Groups:\n");
+    		System.out.println("Groups:");
     		
     		for(WarriorGroup group : warriorGroups)
-    			System.out.println(group.getName() + "," + group.getGroupScore() + "\n");
+    			System.out.println(group.getName() + "," + group.getGroupScore());
     		
-    		System.out.println("\nWarriors\n");
+    		System.out.println("\nWarriors:");
     		
     		for(WarriorGroup group : warriorGroups)
     		{
     			 List<Float> scores = group.getScores();
                  List<WarriorData> data = group.getWarriors();
                  for(int i = 0;i < scores.size();i++)
-                	 System.out.println(data.get(i).getName() + "," + scores.get(i) + "\n");
+                	 System.out.println(data.get(i).getName() + "," + scores.get(i));
     		}
     		
     		return;
