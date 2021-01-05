@@ -94,7 +94,7 @@ public class BlockOfGuruEngine
 			}
 			
 			else if(args[i].equals("--delete-files"))
-				deleteFilesAfterReading = args[i].equals("on");
+				deleteFilesAfterReading = args[i+1].equals("on");
 			
 			else
 			{	

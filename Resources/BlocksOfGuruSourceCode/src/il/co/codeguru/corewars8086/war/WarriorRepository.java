@@ -89,6 +89,8 @@ public class WarriorRepository
         	if(files != null)
         		for(int i = 0;i < files.length;i++)
         			files[i].delete();
+        	
+        	System.out.println("deleted files");
         }
     }
 
