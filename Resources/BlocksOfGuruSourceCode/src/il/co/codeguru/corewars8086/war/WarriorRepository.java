@@ -12,6 +12,8 @@ public class WarriorRepository
 {
 	public static boolean deleteFilesAfterReading; // $BOG
 	public static boolean outputStdout; // $ BOG
+	public static String outputGroup; // $BOG
+	
 	
     /**
      * Maximum initial code size of a single warrior
@@ -230,6 +232,17 @@ public class WarriorRepository
     	// $BOG
     	if(outputStdout)
     	{
+    		if(!outputGroup.equals(""))
+    		{
+    			for(WarriorGroup group : warriorGroups)
+    				if(group.getName().equals(outputGroup))
+    				{
+    					System.out.println(group.getGroupScore());
+    					return;
+    				}
+    			return;
+    		}
+    		
     		System.out.println("Groups:");
     		
     		for(WarriorGroup group : warriorGroups)

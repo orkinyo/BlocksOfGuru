@@ -17,7 +17,7 @@ public class BlockOfGuruEngine
 			+ "\t--wars\t\t\tWARS_PER_COMBINATION - set amount of wars to run per survivors' combination\n\t\t\t\t(1,000 by default)\n"
 			+ "\t--seed\t\t\tSEED - set the initial randomization seed (guru by default)\n"
 			+ "\t--end\t\t\ton/off - turn on or off the option to end a war with one team left (on by default)\n"
-			+ "\t--output, -o\t\tFILEPATH - set the scores output file path, .csv extension is added by default,\n\t\t\t\t/ or \\ can be used in the file path (scores by default) **if the output file path\n\t\t\t\tis stdout or Stdout, the output of the program will not be saved to a file, but\n\t\t\t\tbe printed to stdout\n"
+			+ "\t--output, -o\t\tFILEPATH - set the scores output file path, .csv extension is added by default,\n\t\t\t\t/ or \\ can be used in the file path (scores by default) **if the output file path\n\t\t\t\tis stdout, the output of the program will not be saved to a file, but be printed\n\t\t\t\tto stdout. if you would like to only print the score of one team, use stdout:GROUP_NAME\n"
 			+ "\t--version, -v\t\tdisplay version\n"
 			+ "\t--delete-files\t\ton/off - turn on or off the deletion of warrior and zombie files after reading\n"
 			+ "\t--help, -h\t\tdisplay this help and exit";
@@ -61,6 +61,7 @@ public class BlockOfGuruEngine
 		boolean endOnOneGroup = true; // $BOG
 		String filePath = "scores.csv"; // $BOG
 		boolean outputStdout = false; // $BOG
+		String outputGroup = ""; // $BOG
 		boolean deleteFilesAfterReading = false; // $BOG
 		
 		
@@ -89,7 +90,11 @@ public class BlockOfGuruEngine
 			
 			else if(args[i].equals("--output") || args[i].equals("-o"))
 			{
-				outputStdout = args[i+1].equals("stdout") || args[i+1].equals("Stdout");
+				outputStdout = args[i+1].substring(0, "stdout".length()).equals("stdout");
+				
+				if(args[i+1].length() > "stdout".length())
+					outputGroup = args[i+1].substring("stdout".length() + 1);
+				
 				filePath = args[i+1] + ".csv";
 			}
 			
@@ -112,8 +117,9 @@ public class BlockOfGuruEngine
 		Competition.SCORE_FILENAME = filePath;
         WarriorRepository.outputStdout = outputStdout;
         WarriorRepository.deleteFilesAfterReading = deleteFilesAfterReading;
-		
+		WarriorRepository.outputGroup = outputGroup;
         
+		
         if(isGui)
         {
             CompetitionWindow.warsPerComb = warsPerComb;
