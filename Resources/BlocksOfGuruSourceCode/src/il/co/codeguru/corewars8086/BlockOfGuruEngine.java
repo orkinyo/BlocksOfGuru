@@ -18,13 +18,14 @@ public class BlockOfGuruEngine
 			+ "\t--seed\t\t\tSEED - set the initial randomization seed (guru by default)\n"
 			+ "\t--end\t\t\ton/off - turn on or off the option to end a war with one team left (on by default)\n"
 			+ "\t--output, -o\t\tFILEPATH - set the scores output file path, .csv extension is added by default,\n\t\t\t\t/ or \\ can be used in the file path (scores by default) **if the output file path\n\t\t\t\tis stdout, the output of the program will not be saved to a file, but be printed\n\t\t\t\tto stdout. if you would like to only print the score of one team, use stdout:GROUP_NAME\n"
-			+ "\t--version, -v\t\tdisplay version\n"
 			+ "\t--delete-files\t\ton/off - turn on or off the deletion of warrior and zombie files after reading\n"
+			+ "\t--zomb\t\t\ton/off - turn on or off zomb mode. in zomb mode, each survivor gets a point for\n\t\t\t\tmaking a zomb die in its territory (initial load address), marking a successful takeover\n\t\t\t\t(default off)\n"
+			+ "\t--version, -v\t\tdisplay version\n"
 			+ "\t--help, -h\t\tdisplay this help and exit";
 	
 	static String credits = "Made by BlocksOfGuru members:\nAlon Dayan\nTom Shani";
 	
-	static String version = "1.3";
+	static String version = "1.4";
 	
 	public static void main (String args[]) throws IOException
 	{
