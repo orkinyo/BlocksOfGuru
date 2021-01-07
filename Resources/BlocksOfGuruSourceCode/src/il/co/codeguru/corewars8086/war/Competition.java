@@ -1,5 +1,6 @@
 package il.co.codeguru.corewars8086.war;
 
+import il.co.codeguru.corewars8086.ZombPoint;
 import il.co.codeguru.corewars8086.memory.MemoryEventListener;
 import il.co.codeguru.corewars8086.utils.EventMulticaster;
 
@@ -9,6 +10,7 @@ import java.io.IOException;
 public class Competition {
 
 	public static boolean endOnOneGroup; // $BOG
+	public static ZombPoint[] zombPoints; //$BOG
 	
     /** Maximum number of rounds in a single war. */
     public static int MAX_ROUND; // $BOG
@@ -65,6 +67,11 @@ public class Competition {
         }
         competitionEventListener.onCompetitionEnd();
         warriorRepository.saveScoresToFile(SCORE_FILENAME);
+        
+        // $BOG
+        if(zombPoints != null)
+        	for(int i = 0;i < zombPoints.length;i++)
+        		System.out.println("Address: 0x" + Integer.toHexString(zombPoints[i].getAddress()) + ", AverageScore: " + (zombPoints[i].getScore()/getTotalNumberOfWars()));
     }
 
     public int getTotalNumberOfWars() {
@@ -126,6 +133,11 @@ public class Competition {
         }
         competitionEventListener.onRound(round);
 
+        // $BOG
+        if(zombPoints != null)
+        	for(int i = 0;i < zombPoints.length;i++)
+        		zombPoints[i].addScore(currentWar.getByteFromArena(zombPoints[i].getAddress()));
+        
         int numAlive = currentWar.getNumRemainingWarriors();
         String names = currentWar.getRemainingWarriorNames();
 

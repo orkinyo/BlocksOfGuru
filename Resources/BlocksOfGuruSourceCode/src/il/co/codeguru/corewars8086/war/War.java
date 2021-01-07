@@ -407,7 +407,7 @@ public class War {
     }
     
     /**
-     *  $OMB
+     *  $BOG
      */
     public String[] getWarriorsAliveNames() 
     {
@@ -426,5 +426,14 @@ public class War {
     	}
     	
     	return names;
+    }
+
+
+    /**
+     * $BOG
+     */
+    public int getByteFromArena(short offset)
+    {
+    	return ((int)m_core.readByte(new RealModeAddress((short)0x1000, offset)));
     }
 }
