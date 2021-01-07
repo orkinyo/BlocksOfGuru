@@ -99,7 +99,8 @@ public class WarriorRepository
     }
 
     public void readZombiesFileFromPath(String path) throws IOException {
-        File zombieDirectory = new File(path);
+        ArrayList<String> ZOMB_NAMES = new ArrayList<String>();
+    	File zombieDirectory = new File(path);
         File[] zombieFiles = zombieDirectory.listFiles();
         if (zombieFiles == null) {
             // no zombies!
@@ -113,7 +114,10 @@ public class WarriorRepository
 
             WarriorData data = readWarriorFile(file);
             zombieGroup.addWarrior(data);
+            ZOMB_NAMES.add(data.getName());
         }
+        
+        War.ZOMB_NAMES = ZOMB_NAMES;
     }
 
     public void readWarriorsFileFromPath(String path) throws IOException {

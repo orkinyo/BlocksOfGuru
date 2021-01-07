@@ -18,6 +18,14 @@ import java.util.Random;
  * @author DL
  */
 public class War {
+	
+	// $BOG
+	public static ArrayList<String> ZOMB_NAMES;
+	// $BOG
+	public ArrayList<String> ZOMB_POINTS_NAMES = new ArrayList<String>();
+	
+	public int zombsDead = 0;
+	
     /** Arena's code segment */
     public final static short ARENA_SEGMENT = 0x1000;	
     /** Arena's size in bytes (= size of a single segment) */
@@ -120,10 +128,24 @@ public class War {
                         warrior.nextOpcode();
                     }
                 } catch (CpuException e) {
+                	// $BOG
+                	if(isWarriorZomb(warrior))
+                	{
+                		zombsDead++;
+                		addNameToList(warrior);
+                	}
+                	
                     m_warListener.onWarriorDeath(warrior.getName(), "CPU exception");
                     warrior.kill();
                     --m_numWarriorsAlive;
                 } catch (MemoryException e) {
+                	// $BOG
+                	if(isWarriorZomb(warrior))
+                	{
+                		zombsDead++;
+                		addNameToList(warrior);
+                	}
+                	
                     m_warListener.onWarriorDeath(warrior.getName(), "memory exception");
                     warrior.kill();
                     --m_numWarriorsAlive;
@@ -360,6 +382,19 @@ public class War {
      * Updates the scores in a given score-board.
      */
     public void updateScores(WarriorRepository repository) {
+    	/** $BOG */
+    	if(Competition.endWhenZombsDead)
+    	{
+    		for(int i = 0;i < ZOMB_POINTS_NAMES.size();i++)
+    			for(int j = 0;j < m_warriors.length;j++)
+    				if(ZOMB_POINTS_NAMES.get(i).equals(m_warriors[j].getName()))
+    				{
+    					repository.addScore(m_warriors[j].getName(), 1);
+    					break;
+    				}
+    		return;
+    	}
+    	
         float score = (float)1.0 / m_numWarriorsAlive;
     	for (int i = 0; i < m_numWarriors; ++i) {
             Warrior warrior = m_warriors[i];
@@ -428,12 +463,49 @@ public class War {
     	return names;
     }
 
+    
+    /**
+     * $BOG
+     */
+    public void addNameToList(Warrior zomb)
+    {
+    	short zombIp = zomb.getCpuState().getIP();
+    	String warriorName;
+    	
+    	for(int i = 0;i < m_warriors.length;i++)
+    	{	
+    		if(m_warriors[i] == null)
+    			continue;
+    		
+    		if(m_warriors[i].getLoadOffset() <= zombIp && zombIp <= m_warriors[i].getLoadOffset() + 512)
+    		{
+    			warriorName = m_warriors[i].getName();
+    			if(warriorName.charAt(warriorName.length() - 1) == '1' || warriorName.charAt(warriorName.length() - 1) == '2')
+    				warriorName = warriorName.substring(0, warriorName.length() - 1);
+    			
+    			ZOMB_POINTS_NAMES.add(warriorName);
+    			break;
+    		}
+    	}
+    }
 
     /**
      * $BOG
      */
-    public int getByteFromArena(short offset)
+    public boolean allZombsDead()
     {
-    	return ((int)m_core.readByte(new RealModeAddress((short)0x1000, offset)));
+    	return (zombsDead == ZOMB_NAMES.size());
+    }
+    
+    /**
+     * $BOG
+     */
+    public boolean isWarriorZomb(Warrior warrior)
+    {
+    	for(int i = 0;i < ZOMB_NAMES.size();i++)
+    		if(ZOMB_NAMES.get(i).equals(warrior.getName()))
+    			return true;
+    	
+    	return false;
     }
 }

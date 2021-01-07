@@ -272,7 +272,9 @@ public class CompetitionWindow extends JFrame
     public void onWarriorBirth(String warriorName) {
     }
 
-    public void onWarriorDeath(String warriorName, String reason) {
+    public void onWarriorDeath(String warriorName, String reason)
+    {
+    	
     }
 
     public void onCompetitionStart() {
