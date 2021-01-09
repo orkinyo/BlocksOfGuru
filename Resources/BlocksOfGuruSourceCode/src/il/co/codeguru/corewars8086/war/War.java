@@ -129,7 +129,7 @@ public class War {
                     }
                 } catch (CpuException e) {
                 	// $BOG
-                	if(isWarriorZomb(warrior))
+                	if(Competition.endWhenZombsDead && isWarriorZomb(warrior))
                 	{
                 		zombsDead++;
                 		addNameToList(warrior);
@@ -140,7 +140,7 @@ public class War {
                     --m_numWarriorsAlive;
                 } catch (MemoryException e) {
                 	// $BOG
-                	if(isWarriorZomb(warrior))
+                	if(Competition.endWhenZombsDead && isWarriorZomb(warrior))
                 	{
                 		zombsDead++;
                 		addNameToList(warrior);
