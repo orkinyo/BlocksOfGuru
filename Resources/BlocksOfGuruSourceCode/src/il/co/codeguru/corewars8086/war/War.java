@@ -478,7 +478,6 @@ public class War {
     public void addNameToList(Warrior zomb)
     {
     	short zombIp = zomb.getCpuState().getIP();
-    	String warriorName;
     	
     	for(int i = 0;i < m_warriors.length;i++)
     	{	
@@ -487,11 +486,7 @@ public class War {
     		
     		if(m_warriors[i].getLoadOffset() <= zombIp && zombIp <= m_warriors[i].getLoadOffset() + 512)
     		{
-    			warriorName = m_warriors[i].getName();
-    			if(warriorName.charAt(warriorName.length() - 1) == '1' || warriorName.charAt(warriorName.length() - 1) == '2')
-    				warriorName = warriorName.substring(0, warriorName.length() - 1);
-    			
-    			ZOMB_POINTS_NAMES.add(warriorName);
+    			ZOMB_POINTS_NAMES.add(m_warriors[i].getName());
     			break;
     		}
     	}
