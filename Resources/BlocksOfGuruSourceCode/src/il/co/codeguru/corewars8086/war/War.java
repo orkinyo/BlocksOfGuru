@@ -397,7 +397,7 @@ public class War {
     				
     				if(ZOMB_POINTS_NAMES.get(i).equals(m_warriors[j].getName()))
     				{
-    					if(debugZombs && isWarriorZomb(m_warriors[j]))
+    					if(debugZombs && !isWarriorZomb(m_warriors[j]))
     						System.out.println(m_warriors[j].getName());
     					
     					repository.addScore(m_warriors[j].getName(), 1);
