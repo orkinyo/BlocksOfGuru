@@ -3,6 +3,7 @@ package il.co.codeguru.corewars8086;
 import il.co.codeguru.corewars8086.cpu.Cpu;
 import il.co.codeguru.corewars8086.gui.CompetitionWindow;
 import il.co.codeguru.corewars8086.war.Competition;
+import il.co.codeguru.corewars8086.war.War;
 import il.co.codeguru.corewars8086.war.WarriorRepository;
 
 import java.io.IOException;
@@ -19,7 +20,8 @@ public class BlockOfGuruEngine
 			+ "\t--end\t\t\ton/off - turn on or off the option to end a war with one team left (on by default)\n"
 			+ "\t--output, -o\t\tFILEPATH - set the scores output file path, .csv extension is added by default,\n\t\t\t\t/ or \\ can be used in the file path (scores by default) **if the output file path\n\t\t\t\tis stdout, the output of the program will not be saved to a file, but be printed\n\t\t\t\tto stdout. if you would like to only print the score of one team, use stdout:GROUP_NAME\n"
 			+ "\t--delete-files\t\ton/off - turn on or off the deletion of warrior and zombie files after reading\n"
-			+ "\t--zomb\t\t\ton/off - turn on or off zomb mode. in zomb mode, each survivor gets a point for\n\t\t\t\tmaking a zomb die in its territory (initial load address), marking a successful takeover\n\t\t\t\t(default off)\n"
+			+ "\t--zombs\t\t\ton/off - turn on or off zombs mode. in zombs mode, each survivor gets a point for\n\t\t\t\tmaking a zomb die in its territory (initial load address), marking a successful takeover\n\t\t\t\t(default off)\n"
+			+ "\t--debug-zombs\t\ton/off - turn on or off the printing of the survivor's names' that got a point\n\t\t\t\tfrom zombs mode\n"
 			+ "\t--version, -v\t\tdisplay version\n"
 			+ "\t--help, -h\t\tdisplay this help and exit";
 	
@@ -64,8 +66,8 @@ public class BlockOfGuruEngine
 		boolean outputStdout = false; // $BOG
 		String outputGroup = ""; // $BOG
 		boolean deleteFilesAfterReading = false; // $BOG
-		boolean endWhenZombsDead = false;
-		
+		boolean endWhenZombsDead = false; // $BOG
+		boolean debugZombs = false; // $BOG
 		
 		for(int i = 0;i < args.length;i+=2)
 		{
@@ -103,8 +105,11 @@ public class BlockOfGuruEngine
 			else if(args[i].equals("--delete-files"))
 				deleteFilesAfterReading = args[i+1].equals("on");
 			
-			else if(args[i].equals("--zomb"))
+			else if(args[i].equals("--zombs"))
 				endWhenZombsDead = args[i+1].equals("on");
+			
+			else if(args[i].equals("--debug-zombs"))
+				debugZombs = args[i+1].equals("on");
 			
 			else
 			{	
@@ -124,7 +129,8 @@ public class BlockOfGuruEngine
         WarriorRepository.outputStdout = outputStdout;
         WarriorRepository.deleteFilesAfterReading = deleteFilesAfterReading;
 		WarriorRepository.outputGroup = outputGroup;
-        
+        War.debugZombs = debugZombs;
+		
 		
         if(isGui)
         {

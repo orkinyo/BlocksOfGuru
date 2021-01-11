@@ -24,6 +24,10 @@ public class War {
 	// $BOG
 	public ArrayList<String> ZOMB_POINTS_NAMES = new ArrayList<String>();
 	
+	// $BOG
+	public static boolean debugZombs;
+	
+	// $BOG
 	public int zombsDead = 0;
 	
     /** Arena's code segment */
@@ -393,6 +397,9 @@ public class War {
     				
     				if(ZOMB_POINTS_NAMES.get(i).equals(m_warriors[j].getName()))
     				{
+    					if(debugZombs && isWarriorZomb(m_warriors[j]))
+    						System.out.println(m_warriors[j].getName());
+    					
     					repository.addScore(m_warriors[j].getName(), 1);
     					break;
     				}
