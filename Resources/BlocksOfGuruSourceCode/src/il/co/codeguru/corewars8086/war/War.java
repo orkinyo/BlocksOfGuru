@@ -387,11 +387,16 @@ public class War {
     	{
     		for(int i = 0;i < ZOMB_POINTS_NAMES.size();i++)
     			for(int j = 0;j < m_warriors.length;j++)
+    			{
+    				if(m_warriors[j] == null)
+    					continue;
+    				
     				if(ZOMB_POINTS_NAMES.get(i).equals(m_warriors[j].getName()))
     				{
     					repository.addScore(m_warriors[j].getName(), 1);
     					break;
     				}
+    			}
     		return;
     	}
     	
@@ -453,6 +458,9 @@ public class War {
     	{
     		Warrior warrior = m_warriors[i];
     		
+    		if(warrior == null)
+    			continue;
+    		
     		if(warrior.isAlive())
     		{
     			names[counter] = warrior.getName();
@@ -502,6 +510,9 @@ public class War {
      */
     public boolean isWarriorZomb(Warrior warrior)
     {
+    	if(warrior == null)
+    		return false;
+    	
     	for(int i = 0;i < ZOMB_NAMES.size();i++)
     		if(ZOMB_NAMES.get(i).equals(warrior.getName()))
     			return true;

@@ -25,7 +25,7 @@ public class BlockOfGuruEngine
 	
 	static String credits = "Made by BlocksOfGuru members:\nAlon Dayan\nTom Shani";
 	
-	static String version = "1.4";
+	static String version = "1.5";
 	
 	public static void main (String args[]) throws IOException
 	{
