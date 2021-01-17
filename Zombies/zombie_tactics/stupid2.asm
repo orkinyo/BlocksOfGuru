@@ -30,7 +30,6 @@ xor ah,al
 mov di,ax
 mov [ZOMB_JUMPLOC],dx
 mov word [di+DELTA_FROM_ZOMBSTART],CALL_DI
-add si,0x100
 loop @start
 db 0x64
 @kill_zomb:

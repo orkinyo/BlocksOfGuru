@@ -2,9 +2,9 @@
 %define BOMBLOC_BEAT1 0x8301
 %define BOMBVAL_21 0x6464
 %define BOMBVAL_43 0x6464
-%define DELTA_FROM_ZOMBSTART 0x72
+%define DELTA_FROM_ZOMBSTART 0x70
 %define CALL_DI 0x55FF
-%define ZOMB_JUMPLOC 0x0046
+%define ZOMB_JUMPLOC 0xFFE2
 
 push cs
 pop es
@@ -16,11 +16,11 @@ mov cl,0x34
 loop @here
 mov cl,0x4
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-mov si,0x8100
-push word [si]
-push word [si+0x200]
+mov si,0x100
 push word [si+0x400]
-push word [si+0x600]
+push word [si+0x100]
+push word [si+0x500]
+push word [si]
 @start:
 pop ax
 xlatb

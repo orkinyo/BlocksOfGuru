@@ -16,11 +16,11 @@ mov cl,0x34
 loop @here
 mov cl,0x4
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-mov si,0x8100
-push word [si]
-push word [si+0x200]
-push word [si+0x400]
-push word [si+0x600]
+mov si,0x0100
+push word [si+0x100]
+push word [si+0x300]
+push word [si+0x500]
+push word [si+0x700]
 @start:
 pop ax
 xlatb
