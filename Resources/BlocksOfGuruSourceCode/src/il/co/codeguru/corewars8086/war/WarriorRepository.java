@@ -86,11 +86,13 @@ public class WarriorRepository
         		for(int i = 0;i < files.length;i++)
         			files[i].delete();
         	
+        	/*
         	files = new File(ZOMBIE_DIRECTORY).listFiles();
         	
         	if(files != null)
         		for(int i = 0;i < files.length;i++)
         			files[i].delete();
+        	*/
         }
     }
 
