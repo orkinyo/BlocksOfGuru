@@ -1,6 +1,7 @@
 package il.co.codeguru.corewars8086.war;
 
 import il.co.codeguru.corewars8086.cpu.CpuException;
+import il.co.codeguru.corewars8086.cpu.InvalidOpcodeException;
 import il.co.codeguru.corewars8086.memory.MemoryEventListener;
 import il.co.codeguru.corewars8086.memory.MemoryException;
 import il.co.codeguru.corewars8086.memory.RealModeAddress;
@@ -21,6 +22,9 @@ public class War {
 	
 	// $BOG
 	public static ArrayList<String> ZOMB_NAMES;
+	// $BOG
+	public ArrayList<Boolean> GIVEN_ZOMB_POINTS = initGivenZombiePoints();
+	
 	// $BOG
 	public ArrayList<String> ZOMB_POINTS_NAMES = new ArrayList<String>();
 	
@@ -126,6 +130,23 @@ public class War {
                     // run first opcode
                     warrior.nextOpcode();
 
+                    // $BOG
+                    if(Competition.endWhenZombsDead && isWarriorZomb(warrior))
+                    {
+                    	for(int j = 0;j < ZOMB_NAMES.size();j++)
+                    	{
+                    		if(ZOMB_NAMES.get(j).equals(warrior.getName()))
+                    			if(!GIVEN_ZOMB_POINTS.get(j))
+                    			{
+                    				if(addNameToList(warrior))
+                    				{
+                    					GIVEN_ZOMB_POINTS.set(j, true);
+                    					throw new InvalidOpcodeException();
+                    				}
+                    			}
+                    	}
+                    }
+                    
                     // run one extra opcode, if warrior deserves it :)
                     updateWarriorEnergy(warrior, round);
                     if (shouldRunExtraOpcode(warrior)) {
@@ -134,10 +155,7 @@ public class War {
                 } catch (CpuException e) {
                 	// $BOG
                 	if(Competition.endWhenZombsDead && isWarriorZomb(warrior))
-                	{
                 		zombsDead++;
-                		addNameToList(warrior);
-                	}
                 	
                     m_warListener.onWarriorDeath(warrior.getName(), "CPU exception");
                     warrior.kill();
@@ -145,10 +163,7 @@ public class War {
                 } catch (MemoryException e) {
                 	// $BOG
                 	if(Competition.endWhenZombsDead && isWarriorZomb(warrior))
-                	{
                 		zombsDead++;
-                		addNameToList(warrior);
-                	}
                 	
                     m_warListener.onWarriorDeath(warrior.getName(), "memory exception");
                     warrior.kill();
@@ -482,21 +497,23 @@ public class War {
     /**
      * $BOG
      */
-    public void addNameToList(Warrior zomb)
+    public boolean addNameToList(Warrior zomb)
     {
     	short zombIp = zomb.getCpuState().getIP();
     	
     	for(int i = 0;i < m_warriors.length;i++)
     	{	
-    		if(m_warriors[i] == null)
+    		if(m_warriors[i] == null || isWarriorZomb(m_warriors[i]))
     			continue;
     		
     		if(m_warriors[i].getLoadOffset() <= zombIp && zombIp <= m_warriors[i].getLoadOffset() + 512)
     		{
     			ZOMB_POINTS_NAMES.add(m_warriors[i].getName());
-    			break;
+    			return true;
     		}
     	}
+    	
+    	return false;
     }
 
     /**
@@ -520,5 +537,19 @@ public class War {
     			return true;
     	
     	return false;
+    }
+    
+    
+    public ArrayList<Boolean> initGivenZombiePoints()
+    {
+    	if(!Competition.endWhenZombsDead)
+    		return null;
+    	
+    	ArrayList<Boolean> points = new ArrayList<Boolean>();
+    	
+    	for(int i = 0;i < ZOMB_NAMES.size();i++)
+    		points.add(false);
+    	
+    	return points;
     }
 }

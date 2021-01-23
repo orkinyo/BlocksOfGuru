@@ -101,9 +101,8 @@ public class WarriorRepository
     }
 
     public void readZombiesFileFromPath(String path) throws IOException {
-        
+        // $BOG
     	ArrayList<String> ZOMB_NAMES = new ArrayList<String>();
-    	
         
         File zombieDirectory = new File(path);
         File[] zombieFiles = zombieDirectory.listFiles();
@@ -119,11 +118,14 @@ public class WarriorRepository
 
             WarriorData data = readWarriorFile(file);
             zombieGroup.addWarrior(data);
+            // $BOG
             ZOMB_NAMES.add(data.getName());
         }
         
         if(Competition.endWhenZombsDead)
+        {
         	War.ZOMB_NAMES = ZOMB_NAMES;
+        }
     }
 
     public void readWarriorsFileFromPath(String path) throws IOException {
