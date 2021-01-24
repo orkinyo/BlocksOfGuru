@@ -13,13 +13,11 @@
 %define CALL_DI 0x95FF
 %define ZOMB_JUMPLOC 0x8346
 %define ZOMB_JUMP_OPCODE (((@zomb_land - @zomb_jump - 0x2) * 0x100) + 0xEB)
+%define ZOMB_NOP_JUMP_OPCODE (((@create_zombie_delta - @write_nop - 0x2) * 0x100) + 0xEB)
 ;;
 ;; INT 87, 86 DEFINES
 %define INT87_OPCODE_1 0xA5A5
 %define INT87_OPCODE_2 0xA5A5
-;;
-;; OTHER
-%define NOP_OPCODE 0xDB87
 ;;
 
 
@@ -73,21 +71,22 @@ mov word [bx+di-0x4],ADD_SP
 push cs
 pop es
 
-lea di,[si + @end]
 
-mov ax,INT87_OPCODE_1
-mov dx,INT87_OPCODE_2
-mov bx,0xCCCC
-mov cx,bx
+mov di,ax
+add di,0x2000
 
-int 0x87
+mov ax,0xCCCC
+mov dx,ax
+mov bx,INT87_OPCODE_1
+mov cx,INT87_OPCODE_2
+
+int 0x86
+int 0x86
 
 xchg ax,bx
 xchg cx,dx
 
-add di,0x600
-int 0x86
-int 0x86
+int 0x87
 
 @zomb_jump:
 push es
@@ -98,9 +97,9 @@ mov cx,0x3
 cbw
 cwd
 loop @fuck_michael
+nop
 
-mov word [si-@copy_end+@write_nop],NOP_OPCODE
-mov word [si-@copy_end+@write_nop + 0x2],NOP_OPCODE
+mov word [si-@copy_end+@write_nop],ZOMB_NOP_JUMP_OPCODE
 
 lea dx,[si-@copy_end+@zomb_start]
 mov bx,si
