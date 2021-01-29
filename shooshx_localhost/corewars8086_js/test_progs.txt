@@ -1,0 +1,127 @@
+
+; infinite loop write
+start:
+mov bx, ax
+add bx, 10
+mov byte[bx],0x11
+inc bx
+jmp start
+
+
+
+; loop write
+start:
+mov bx, ax
+add bx, 12
+mov cx,16
+wrtl:
+mov byte[bx],0x90
+inc bx
+loop wrtl
+
+
+
+; writing and jumping to it
+start:
+mov bx, ax
+add bx, 20
+mov dx, bx
+mov cx,10
+wrtl:
+mov byte[bx],0x90
+inc bx
+loop wrtl
+jmp dx
+
+
+start:
+mov bx, ax
+add bx, 31
+mov dx, bx
+mov cx,5
+wrtl:
+mov byte[bx],0x83
+mov byte[bx+1],0xc2
+mov byte[bx+2],0x10
+add bx,3
+loop wrtl
+jmp dx
+
+
+;;;;;; db instead of opcodes in text
+start:
+mov bx, ax
+add bx, 12
+loop:
+db 0xc6
+db 07
+db 0x11
+db 0x43
+jmp loop
+
+
+;;;;; jump inside instruction and crash
+start:
+mov bx, ax
+add bx, 12
+jmp lup + 1
+lup:
+mov byte[bx],0x11
+inc bx
+jmp lup
+
+; and eat next opcode
+start:
+mov bx, ax
+add bx, 18
+jmp lup + 2
+lup:
+mov word[si],0x07c6
+inc bx
+jmp lup
+
+; and eat next opcode and write to the same place!
+start:
+mov bx, ax
+add bx, 12
+jmp lup + 2
+lup:
+mov word[si],0x07c6
+inc bx
+jmp lup
+
+
+; memory write inside a big opcode - should make it reparse completely
+start:
+mov bx, ax
+add bx, 17
+jmp lup + 2
+lup:
+mov word[si],0x07c6
+inc bx
+jmp lup
+
+mov word[si], 0x7C6
+
+; TBD memory write at the beginning of a big opcode
+start:
+mov bx, ax
+add bx, 14
+jmp lup + 2
+lup:
+mov word[si],0x07c6
+inc bx
+jmp lup
+
+mov word[si], 0x7C6
+
+
+; comment on the second line - this crashed loading due to setting the working line as a line with comment when dfXXXX is still not created
+inc ax
+;bla
+inc ax
+
+; parens in lst
+start:
+add DI, start+1
+jmp 1

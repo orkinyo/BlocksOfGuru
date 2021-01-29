@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+  <head>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-2231125-10"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-2231125-10');
+</script>   
+    <meta charset="UTF-8">
+    <title>CodeWars8086</title>
+    <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAJ5WlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDggNzkuMTY0MDM2LCAyMDE5LzA4LzEzLTAxOjA2OjU3ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIgeG1sbnM6cGhvdG9zaG9wPSJodHRwOi8vbnMuYWRvYmUuY29tL3Bob3Rvc2hvcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RFdnQ9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZUV2ZW50IyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIDIxLjAgKFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAyMC0xMC0zMFQxMDoyNDoxNSswMjowMCIgeG1wOk1vZGlmeURhdGU9IjIwMjAtMTAtMzBUMTA6MjY6MzcrMDI6MDAiIHhtcDpNZXRhZGF0YURhdGU9IjIwMjAtMTAtMzBUMTA6MjY6MzcrMDI6MDAiIGRjOmZvcm1hdD0iaW1hZ2UvcG5nIiBwaG90b3Nob3A6Q29sb3JNb2RlPSIzIiBwaG90b3Nob3A6SUNDUHJvZmlsZT0ic1JHQiBJRUM2MTk2Ni0yLjEiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6ZmY1ODBiM2MtZTBkMC03ODRmLWFkOTUtMWEzODFjNGZlNDNhIiB4bXBNTTpEb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6ZGJlZjQ5NDYtOTBiMi01YjQzLWFiOTQtNzVlZWViMzk3ODkxIiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6OGU4YmNjMmQtNWI4Ni1kNzQxLWJkOTgtZWU0ODllMmI4YjFlIj4gPHhtcE1NOkhpc3Rvcnk+IDxyZGY6U2VxPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0iY3JlYXRlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDo4ZThiY2MyZC01Yjg2LWQ3NDEtYmQ5OC1lZTQ4OWUyYjhiMWUiIHN0RXZ0OndoZW49IjIwMjAtMTAtMzBUMTA6MjQ6MTUrMDI6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCAyMS4wIChXaW5kb3dzKSIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0iY29udmVydGVkIiBzdEV2dDpwYXJhbWV0ZXJzPSJmcm9tIGltYWdlL3BuZyB0byBhcHBsaWNhdGlvbi92bmQuYWRvYmUucGhvdG9zaG9wIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDo4ZWU2Y2ExMC00N2E3LTliNDgtYTE0YS04ZWQ3OTU5N2VlNzUiIHN0RXZ0OndoZW49IjIwMjAtMTAtMzBUMTA6MjY6MDkrMDI6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCAyMS4wIChXaW5kb3dzKSIgc3RFdnQ6Y2hhbmdlZD0iLyIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0ic2F2ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6ZDkxMTc1OTAtYTJjYi1kYzRkLWE5NDctOTBjZDRiZmM2YWU2IiBzdEV2dDp3aGVuPSIyMDIwLTEwLTMwVDEwOjI2OjM3KzAyOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgMjEuMCAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNvbnZlcnRlZCIgc3RFdnQ6cGFyYW1ldGVycz0iZnJvbSBhcHBsaWNhdGlvbi92bmQuYWRvYmUucGhvdG9zaG9wIHRvIGltYWdlL3BuZyIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0iZGVyaXZlZCIgc3RFdnQ6cGFyYW1ldGVycz0iY29udmVydGVkIGZyb20gYXBwbGljYXRpb24vdm5kLmFkb2JlLnBob3Rvc2hvcCB0byBpbWFnZS9wbmciLz4gPHJkZjpsaSBzdEV2dDphY3Rpb249InNhdmVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOmZmNTgwYjNjLWUwZDAtNzg0Zi1hZDk1LTFhMzgxYzRmZTQzYSIgc3RFdnQ6d2hlbj0iMjAyMC0xMC0zMFQxMDoyNjozNyswMjowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIDIxLjAgKFdpbmRvd3MpIiBzdEV2dDpjaGFuZ2VkPSIvIi8+IDwvcmRmOlNlcT4gPC94bXBNTTpIaXN0b3J5PiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpkOTExNzU5MC1hMmNiLWRjNGQtYTk0Ny05MGNkNGJmYzZhZTYiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6OGU4YmNjMmQtNWI4Ni1kNzQxLWJkOTgtZWU0ODllMmI4YjFlIiBzdFJlZjpvcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6OGU4YmNjMmQtNWI4Ni1kNzQxLWJkOTgtZWU0ODllMmI4YjFlIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+rcfuXwAAAjdJREFUOI2Vk01PE1EUhp/pfDAzLVNaiqWK0moi2BgjkiAmJkYTEnWlkR/gnzBx45LIksS4MiaycGXUdKEx4sdGSIwRhbjwA+XDQKAtA6XCTNtprwtSpCloPKt7Fu9z33PPeyUhBNWaSg0IRZU3G0XHH+0geKgHLdAssUsp25uQvkjRyZB3IwjZovTLZn1+AkBYB08R7jxTB5KqDgoLsyJz/wrB7iMoioHnOYj1Ahuuh+22IutNNPgtQsk+gvHuLZCveshPjFIcXSX96C1KxEQ2TJRICKuthUTMIaZPsbE8R3o8xczzIVEHKCxMg6bjZSsA2G/eM3/3FUuPxxBGGSUSIhFzaCx/opBLM/N0UNQAiplFAPzdTeQmP1McXUXOCsRXh5+3xlCDBnI0SDAaIaZPUecgfO4C5lmTPedPs/E9g89sBE0HTadolyit2EgyeIUsWuIk8YvXpRqA1dWLdbwLgMZkM/msvXWLfkAD4MdAisztSaRwf/0al188Y3n4JaG+OE09R4lfC5D7OIcS8GEdO8FS6gNqyU9s6CENe9vrt+BMf0F1YWVkBgDZDKAEfCihMJIGRrKXfUNPMOIdNVnYcuCt2ZtzV/J4a/bmw7kANt6l/bRevbNjGv8AclncrE3L5SiF9CJqRcdnqhRVhXD/4E5aYFsSK86scMdvoIbClFZsvt0cwWhu4/Dwu13/QY0Dn9EuSRpClEFSHZL3XqNGOv8qrgFUq+zaGD0P/incGSCc/xID/Abjh8t+yaqdwwAAAABJRU5ErkJggg==">
+    <script type="text/javascript" language="javascript" src="asm_js_main.js"></script>
+    <script type="text/javascript" language="javascript" src="codewars_js/codewars_js.nocache.js"></script>  
+    <script type="text/javascript" language="javascript" src="lib/jszip.js"></script>
+    <script type="text/javascript" language="javascript" src="main.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    
+</head>
+  <body id="body" onload="start()">
+
+    <div id="action_panel"><div id="action_rel">
+      <div id="memory_panel">
+        <input type="checkbox" id="warCanvasDummyInput" class="hidden">
+        <canvas id="warCanvas"></canvas>
+        <div id="hoverCellInfo"></div>
+
+      </div>
+
+      <div id="edit_panel">
+        <input type="text" id="editor_title" spellcheck="false">
+        <input id="uploadBinInput" type="file" class="hidden" onchange="return triggerUploadBinChanged()">
+        <label id="uploadBinBut" class="sc-btn" for="uploadBinInput" title="Upload binary file or zip file with survivors,zombies folder"></label>
+        <label id="downloadBinBut" class="sc-btn" title="Download binary file" onclick="triggerDownloadBin()"></label><a id="downloadLink" style='display: none;'></a>
+
+        <br>
+        <div id="editor_boxes">
+          <div id="edit_area">
+              <div id="box_numbers"></div>
+              <pre id="asm_pre" class="codearea"><div id="asm_show_rel"><code id="asm_show" class="codearea"></code></div><code id="opcodes_edit" class="codearea allow_select" wrap="off"></code><code id="asm_linenums" class="codearea" wrap="off">1</code></pre>
+              <textarea id="asm_edit" class="codearea allow_select" wrap="off"
+                   spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off"
+                   onscroll="handle_asm_edit_scroll()"></textarea>
+              <div id="box_opcodes"></div> <!-- want these in front of the text but it ignores pointer events -->
+              <div id="box_edit"></div>
+          </div>
+          <div id="debug_area" style="display:none;">
+              <input type="text" id="debug_goto" spellcheck="false" onkeyup="triggerGoToKey()">
+              <label id="btnGoTo" class="sc-btn" onclick="triggerGoTo()">go to</label>
+              <span id="stepnum_cont">Step:<span id="stepnum">0</span></span>
+              <div id="dbg_box_addr"></div>
+              <pre id="debug_text" class="allow_select" onscroll="debugAreaScroll(false)"></pre>
+          </div>
+        </div>
+        <div id="editor_bottom">
+            <div id="asm_output" class="codearea allow_select" wrap="off" ></div>
+            <div id="asm_options">
+                Debug load address:
+                <select id="asm_load_addr_type" class="my_combo_box" onchange="changedLoadAddrType()">
+                    <option value="rand">Random</option>
+                    <option value="fixed">Fixed</option>
+                </select>
+                <input type="text" class="small_editline" id="fixed_load_addr" spellcheck="false" value="A000" oninput="changedFixedAddr()">
+                <span id="seed_edit">Seed:<input class="small_editline" id="seed" type="text" spellcheck="false"></span>
+
+            </div>
+        </div>
+
+       <!-- <div id="watch_container">
+          <div class="submem_title">Watch</div>
+          <div id="watchArea">
+          </div>
+          </div>
+        </div>-->
+
+      </div>
+
+      <div id="cpuPanel" style="display:none;">
+        <div id="dbgButtons">
+          <label id="btnPause" class="sc-btn title-buttons">Pause</label>
+          <label id="btnSingleRound" class="sc-btn title-buttons">Step</label>
+          <span id="speedSliderCont">Speed:<input type="range" min="-35" max="200" value="0" class="slider" id="speedSlider">
+              <span id="speedSliderVal">0</span>
+              <span id="speedZero" class="sc-btn base-btn" onclick="j_triggerZeroSpeed()"></span><br>
+          </span>
+        </div>
+        <div id="registers_block">
+          <div id="hex_dec">
+            <input id="hexCheckbox" class="sc-check hidden" onchange="triggerRegBase(true)" type="checkbox" checked="true">
+              <label id="hexBtn" class="sc-btn base-btn" for="hexCheckbox">Hex</label><br>
+            <input id="decCheckbox" class="sc-check hidden" onchange="triggerRegBase(false)" type="checkbox">
+              <label id="decBtn" class="sc-btn base-btn" for="decCheckbox">Dec</label>
+          </div>
+          <span class="reg_name">AX:</span><input type="text" id="reg_AX" class="reg_input" maxlength="5" spellcheck="false">
+          <span class="reg_name">BX:</span><input type="text" id="reg_BX" class="reg_input" maxlength="5" spellcheck="false">
+          <span class="reg_name">CX:</span><input type="text" id="reg_CX" class="reg_input" maxlength="5" spellcheck="false">
+          <span class="reg_name">DX:</span><input type="text" id="reg_DX" class="reg_input" maxlength="5" spellcheck="false"><br>
+          <span class="reg_name">SI:</span><input type="text" id="reg_SI" class="reg_input" maxlength="5" spellcheck="false">
+          <span class="reg_name">DI:</span><input type="text" id="reg_DI" class="reg_input" maxlength="5" spellcheck="false">
+          <span class="reg_name">BP:</span><input type="text" id="reg_BP" class="reg_input" maxlength="5" spellcheck="false">
+          <span class="reg_name">SP:</span><input type="text" id="reg_SP" class="reg_input" maxlength="5" spellcheck="false"><br>
+          <span class="reg_name">CS:</span><input type="text" id="reg_CS" class="reg_input" maxlength="5" spellcheck="false">
+          <span class="reg_name">DS:</span><input type="text" id="reg_DS" class="reg_input" maxlength="5" spellcheck="false">
+          <span class="reg_name">SS:</span><input type="text" id="reg_SS" class="reg_input" maxlength="5" spellcheck="false">
+          <span class="reg_name">ES:</span><input type="text" id="reg_ES" class="reg_input" maxlength="5" spellcheck="false"><br>
+          <span class="reg_name">IP:</span><input type="text" id="reg_IP" class="reg_input" maxlength="5" spellcheck="false">
+          <span class="reg_name reg_long_name">Energy:</span><input type="text" id="reg_Energy" class="reg_input" maxlength="5" spellcheck="false">
+          <span class="reg_name reg_long_name">Flags:</span><input type="text" id="reg_Flags" class="reg_input" maxlength="5" spellcheck="false"><br>
+          <table id="reg_flags_table" cellspacing="0">
+              <tr><td class="flag_unsed" title="Reserved"></td>
+                  <td class="flag_unsed" title="Reserved"></td>
+                  <td class="flag_unsed" title="Reserved"></td>
+                  <td class="flag_unsed" title="Reserved"></td>
+                  <td id="OF_bk1" title="Overflow Flag">OF</td>
+                  <td id="DF_bk1" title="Direction Flag">DF</td>
+                  <td id="IF_bk1" title="Interrupt Enable Flag">IF</td>
+                  <td id="TF_bk1" title="Trap Flag">TF</td>
+                  <td id="SF_bk1" class="bytesep" title="Sign Flag">SF</td>
+                  <td id="ZF_bk1" title="Zero Flag">ZF</td>
+                  <td class="flag_unsed" title="Reserved"></td>
+                  <td id="AF_bk1" title="Adjust Flag">AF</td>
+                  <td class="flag_unsed" title="Reserved"></td>
+                  <td id="PF_bk1" title="Parity Flag">PF</td>
+                  <td class="flag_unsed" title="Reserved"></td>
+                  <td id="CF_bk1" title="Carry Flag">CF</td></tr>
+              <tr>
+                  <td class="flag_unsed" title="Reserved"></td>
+                  <td class="flag_unsed" title="Reserved"></td>
+                  <td class="flag_unsed" title="Reserved"></td>
+                  <td class="flag_unsed" title="Reserved"></td>
+                  <td id="OF_bk2">
+                      <input class="flag_check_box hidden mycheck" id="OF_fcheck" type="checkbox">
+                      <label class="flag_check mycheck_label" for="OF_fcheck" title="Overflow Flag"></label></td>
+                  <td id="DF_bk2">
+                      <input class="flag_check_box hidden mycheck" id="DF_fcheck" type="checkbox">
+                      <label class="flag_check mycheck_label" for="DF_fcheck" title="Direction Flag"></label></td>
+                  <td id="IF_bk2">
+                      <input class="flag_check_box hidden mycheck" id="IF_fcheck" type="checkbox">
+                      <label class="flag_check mycheck_label" for="IF_fcheck" title="Interrupt Enable Flag"></label></td>
+                  <td id="TF_bk2">
+                      <input class="flag_check_box hidden mycheck" id="TF_fcheck" type="checkbox">
+                      <label class="flag_check mycheck_label" for="TF_fcheck" title="Trap Flag"></label></td>
+                  <td id="SF_bk2" class="bytesep">
+                      <input class="flag_check_box hidden mycheck" id="SF_fcheck" type="checkbox">
+                      <label class="flag_check mycheck_label" for="SF_fcheck" title="Sign Flag"></label></td>
+                  <td id="ZF_bk2">
+                      <input class="flag_check_box hidden mycheck" id="ZF_fcheck" type="checkbox">
+                      <label class="flag_check mycheck_label" for="ZF_fcheck" title="Zero Flag"></label></td>
+                  <td class="flag_unsed" title="Reserved"></td>
+                  <td id="AF_bk2">
+                      <input class="flag_check_box hidden mycheck" id="AF_fcheck" type="checkbox">
+                      <label class="flag_check mycheck_label" for="AF_fcheck" title="Adjust Flag"></label></td>
+                  <td class="flag_unsed" title="Reserved"></td>
+                  <td id="PF_bk2">
+                      <input class="flag_check_box hidden mycheck" id="PF_fcheck" type="checkbox">
+                      <label class="flag_check mycheck_label" for="PF_fcheck" title="Parity Flag"></label></td>
+                  <td class="flag_unsed" title="Reserved"></td>
+                  <td id="CF_bk2">
+                      <input class="flag_check_box hidden mycheck" id="CF_fcheck" type="checkbox">
+                      <label class="flag_check mycheck_label" for="CF_fcheck" title="Carry Flag"></label></td>
+              </tr>
+          </table>
+          <div id="stackArea" class="submem_area">
+              <div class="submem_title">Stack</div>
+              <div class="submem_box_addr"></div>
+              <div id="stackList" class="submem_list"></div>
+          </div>
+          <div id="sharedMemArea" class="submem_area">
+              <div class="submem_title">Shared Memory</div>
+              <div class="submem_box_addr"></div>
+              <div id="sharedMemList" class="submem_list"></div>
+          </div>
+            <div id="watch_container">
+                <div class="submem_title">Watch</div>
+                <div id="watchArea">
+                </div>
+            </div>
+
+          <br>
+          <div id="messagesArea" class="codearea allow_select" wrap="off" ></div>
+        </div>
+      </div>
+
+    </div></div>
+    <div id="gray_out_debugger"  ontransitionend="gray_out_anim_end()" ></div>
+
+    <div id="players_panel">
+      <div id="players_rel">
+        <div id="hamburgBtn" class="sc-btn" onclick="triggerHamMenu(event)"></div>
+
+        <input id="competeCheckbox" class="hidden sc-check" onchange="openCompete()" type="checkbox">
+        <label id="competeBtn" class="sc-btn" for="competeCheckbox">
+            <span id="competeBtnIn2">Competition</span>
+        </label>
+        <br>
+        <input id="debugCheckbox" class="hidden" onchange="triggerDebug()" type="checkbox">
+        <label id="debugBtn" class="sc-btn" for="debugCheckbox">
+          <span id="debugBtnIn" class="sc-span"></span>
+          <span id="debugBtnIn2">Debug</span>
+        </label>
+        <div id="players_contaier">
+
+        </div>
+        <label id="addPlayerBtn" class="sc-btn" onclick="addPlayersPanel()" title="Add Player"><span id="addPlayerBtnIn"></span></label>
+
+        <div id="pl_frame_zombies" class="toppic">
+            <div class="famtitle">
+                <input class="fam_check_box hidden mycheck" id="player_check_zombies" type="checkbox" checked onchange="" >
+                <label class="fam_check mycheck_label" for="player_check_zombies"></label>
+                <label id="player_name_lbl_zombies" class="fam_label">Zombies</label>
+            </div>
+            <div id="zombies_container">
+
+            </div>
+            <label id="addZombieBtn" class="sc-btn" onclick="addZombieCode()" title="Add Zombie"><span id="addZombieBtnIn"></span></label>
+
+        </div>
+
+
+      </div>
+    </div>
+
+    <div id="graphs_panel" style="width:0; opacity:0;" ontransitionend="graph_panel_anim_end()">
+        <div id="graphs_title">Competition</div>
+        <div id="graphs_control">
+            <input id="competeRunCheckbox" class="hidden" onchange="triggerStartCompete()" type="checkbox">
+            <label id="competeRunBtn" class="sc-btn" for="competeRunCheckbox">
+                <span id="competeRunBtnIn" class="sc-span"></span>
+                <span id="competeRunBtnIn2">Start!</span>
+            </label>
+            <label id="battlesLabel">Battles to run:</label>
+            <input id="battlesPerGroupField" type="text" spellcheck="false">
+            <label id="battlesRan"></label>
+            <div id="copyTableBtn" class="sc-btn" onclick="triggerCopyTable()">Copy</div>
+            <canvas id="graphs_canvas" width="680" height="600"></canvas>
+            <div id="results_table"></div>
+        </div>
+
+    </div>
+
+    <div id="aboutBack" class="popupBack" onclick="triggerAbout(false)"><div id="aboutWin" class="popupWin">
+        <h1>codewars8086_js</h1><br>
+        <h2>Javascript GUI, integrated editor and debugger: Shy Shalom<br>
+        <h2>Original codeguru emulator: Danny Leshem<br>
+        <h3>If you find a bug open a new issue in:<br>
+            <a href="https://github.com/shooshx/corewars8086_js/issues" target="_blank">https://github.com/shooshx/corewars8086_js/issues</a><br>
+        Or email to:<br>
+            <a href="mailto:shooshx@gmail.com" target="_blank">shooshx@gmail.com</a><br>
+        <h3>
+    </div></div>
+    <div id="error_box">
+        <div id="error_title">Error</div>
+        <div id="error_msg"></div>
+    </div>
+
+  </body>
+</html>

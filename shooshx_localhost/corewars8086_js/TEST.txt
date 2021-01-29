@@ -1,0 +1,30 @@
+test editor
+
+- scroll vertical, horizontal
+   - with errors
+- selection, copy, paste
+- mouse scrolling
+- arrows scrolling - scrolls all the way back?
+- undo, redo
+- special html characters <,>,&
+- tab press
+- indentation
+- using backslash to concatenate lines in the input
+- double clicking a warning to get to the problem line
+   - with backslashes:
+aaa
+\
+mov \
+ax,bx
+aa
+- scroll when the pointer is in the opcodes part
+
+
+wrong opcode - 3f
+
+memory exception:
+
+mov sp,0xfffe
+pop bx
+
+mem exception in the middle of an opcode?
