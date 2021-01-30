@@ -6,7 +6,7 @@
 %define ADD_SP (JUMP_DIST + CALL_DIST)
 %define ZOMB_COUNTER 0x515
 %define SHARE_LOC 0x39AC
-%define ROWS_GAP 0x4
+%define ROWS_GAP 0xF
 ;;
 ;; ZOMBIE DEFINES
 %define DELTA_FROM_ZOMBSTART 0x72

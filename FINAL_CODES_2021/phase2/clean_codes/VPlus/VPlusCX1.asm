@@ -10,11 +10,17 @@ add si,@copy
 mov cl,0xF
 div cx
 add dx,0xFF6
-mov [SHARE_LOC],dx
 
 mov cl,(@copy_end - @copy)/0x2
 push ss
 pop es
+
+mov [SHARE_LOC],dx
+
+;;;;;;;;;;;;;;;;;
+db 0xCC
+;;;;;;;;;;;;;;;;;
+
 movsb
 rep movsw
 
