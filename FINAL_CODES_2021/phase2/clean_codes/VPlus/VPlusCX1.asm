@@ -11,23 +11,20 @@ mov cl,0xF
 div cx
 add dx,0xFF6
 
+mov bp,dx
+mov cl,0x4
+shl bp,cl
+mov [SHARE_LOC],bp
+
 mov cl,(@copy_end - @copy)/0x2
 push ss
 pop es
 
-mov [SHARE_LOC],dx
-
 movsb
 rep movsw
 
-
-mov bp,dx
-
 push ss
 pop ds
-
-mov cl,0x4
-shl bp,cl
 
 lea bx,[bp + CALL_DIST + 0x1]
 add ax,JUMP_DIST
@@ -66,6 +63,7 @@ call far [bx]
 db 0x68
 
 @loader:
+movsb
 movsw
 rep movsw
 @loop:

@@ -1,3 +1,4 @@
+;; NTT+ DEFINES
 %define INTERVAL 0xF1
 %define TRUE_INTERVAL (INTERVAL - 0x4)
 %define JUMP_DIST 0x4000
@@ -10,42 +11,129 @@
 %define DIST_CALC (0xA2 + 0x4*0x4 -((@main_loop_end - @copy) + BOTTOM_TRAP_DIST))
 %define SAFETY_GAP 0x10
 %define DX_OFFSET 0x6
+%define CL_PART1 ((@copy_end - @copy)/0x2 - 0x15)
+%define CL_PART2 0x15
+%define SI_PART1 (CL_PART1*0x2)
+;;
+;; ZOMBIE DEFINES
+%define ZOMB_CALL_ADDRESS 0xFF83
+%define ZOMB_WRITE_DIST 0x6C
+%define CALL_DI_OPCODE 0x55FF
+;;
 
 
-add ax,@copy
+
+jmp @our_start
+
+@zombie_start:
+
+
+@our_start:
+add ax,@copy_end - SI_PART1
 mov si,ss
 mov bx,ss
 and bx,0x10
 lea si,[bx+si+0x4]
 xchg ax,si
 
+push si ; for end
+
 mov es,ax
 
-mov di,INIT_SI
+mov di,INIT_SI + @copy_end - @copy - SI_PART1
 
 xchg bp,[SHARE_LOC]
-
-mov cl,(@copy_end - @copy)/0x2
-rep movsw
-
-mov ds,ax
 
 lea dx,[si - @copy_end + JUMP_DIST]
 mov dl,((DIST_CALC - SAFETY_GAP)%(0x100)) + DX_OFFSET - 0x10
 add dx,bp
 
+push dx ; for end
+
+mov cl,CL_PART1
+rep movsw
+
+;; zombie section
+mov dx,0x8200
+mov cl,0x4
+mov di,dx
+lea bx,[si - @copy_end + @zombie_start]
+mov [si - @copy_end + @write_ah + 0x3],bh
+mov [si - @copy_end + @write_al + 0x4],bl
+add bx,@zombie_loop - @zombie_start
+mov [si - @copy_end + @dec_xchg + 0x2],bx
+mov [si - @copy_end + @reset_xchg + 0x2],bx
+xor si,si
+xchg bx,[SHARE_LOC]
+
+
+mov [0xC801],bp
+mov [0xC501],bp
+@bomb_again:
+mov [0xC701],bp
+mov [0xC401],bp
+mov [0xC101],bp
+mov [0xC201],bp
+mov [0xC301],bp
+
+@xchg:
+xchg bp,[di]
+xchg si,[di + 0x200]
+xchg sp,[di + 0x400]
+xchg di,[di + 0x600]
+
+@zombie_loop:
+xchg ax,di
+xlatb
+xchg ah,al
+xlatb
+xor ah,al
+mov di,ax
+@write_ah:
+mov word [di + ZOMB_WRITE_DIST + 0x2],0xFFCC
+@write_al:
+mov word [di + ZOMB_WRITE_DIST],0xCCB9
+@dec_xchg:
+dec byte [0xCCCC]
+loop @zombie_loop
+
+@reset_xchg:
+mov byte [0xCCCC],0x97
+mov cl,0x4
+
+inc dl
+mov di,dx
+
+jnp @bomb_again
+
+
+;; zombie section end
+
+
+mov sp,0x7FC ; for end
+pop dx ; for end
+pop si ; for end
+
+mov cl,CL_PART2
+mov di,INIT_SI
+add si,SI_PART1 - @copy_end + @copy
+rep movsw
+
+push es
+pop ds
+
 mov bx,dx
 add bx,(@main_loop - @copy - TOP_TRAP_DIST - 0x2)
-
-push cs
-pop es
 
 push cs
 pop ss
 
 mov si,(INIT_SI + @reset_main_loop - @copy - 0x2)
 
-mov [@main_loop_end - @copy + INIT_SI + 0x8],ax
+mov [@main_loop_end - @copy + INIT_SI + 0x8],es
+
+push cs
+pop es
 
 mov ax,BOMB_VAL
 
