@@ -3,8 +3,8 @@
 %define BOMBVAL_21 0x6464
 %define BOMBVAL_43 0x6464
 %define DELTA_FROM_ZOMBSTART 0x72
-%define CALL_DI 0x55FF
-%define ZOMB_JUMPLOC 0x0046
+%define CALL_DI 0x95FF
+%define ZOMB_JUMPLOC 0x8346
 
 push cs
 pop es

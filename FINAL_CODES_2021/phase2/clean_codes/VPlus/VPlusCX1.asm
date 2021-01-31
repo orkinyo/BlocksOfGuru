@@ -17,10 +17,6 @@ pop es
 
 mov [SHARE_LOC],dx
 
-;;;;;;;;;;;;;;;;;
-db 0xCC
-;;;;;;;;;;;;;;;;;
-
 movsb
 rep movsw
 

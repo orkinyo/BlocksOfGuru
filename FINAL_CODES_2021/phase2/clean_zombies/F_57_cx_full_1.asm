@@ -3,37 +3,65 @@
 %define BOMBVAL_21 0x6464
 %define BOMBVAL_43 0x6464
 %define DELTA_FROM_ZOMBSTART 0x72
-%define CALL_DI 0x95FF
-%define ZOMB_JUMPLOC 0x8346
+%define ZOMB_CALL_ADDRESS 0xFF83
+%define ZOMB_WRITE_DIST 0x6c
+%define CALL_DI_OPCODE 0x55FF
 
 push cs
 pop es
 mov bx,ax
 add bx,@arr
-lea dx,[bx-@arr+@kill_zomb] 
-mov cl,0x34
+mov dh,0x81
+mov [bx-@arr+@write_ah+0x3],bh
+mov [bx-@arr+@write_al+0x4],bl
+mov di,dx
+mov cl,0x28
 @here:
 loop @here
 mov cl,0x4
+
+
+mov [0x4801],bp
+mov [0x4501],bp
+@bomb_sec:
+mov [0x4701],bp
+mov [0x4401],bp
+mov [0x4101],bp
+mov [0x4201],bp
+mov [0x4301],bp
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-mov si,0x0100
-push word [si]
-push word [si+0x200]
-push word [si+0x400]
-push word [si+0x600]
+@xchg:
+xchg bp,[di]
+xchg si,[di + 0x200]
+xchg sp,[di + 0x400]
+xchg di,[di + 0x600]
+
+; registers order: di, si, bp, sp
 @start:
-pop ax
+xchg ax,di
 xlatb
 xchg ah,al
 xlatb
 xor ah,al
 mov di,ax
-mov [ZOMB_JUMPLOC],dx
-mov word [di+DELTA_FROM_ZOMBSTART],CALL_DI
+@write_ah:
+mov word [di + ZOMB_WRITE_DIST + 0x2],0xFFCC
+@write_al:
+mov word [di + ZOMB_WRITE_DIST],0xCCB9
+dec byte [bx - @arr + @start]
 loop @start
-db 0x64
-@kill_zomb:
-db 0xCC
+
+mov byte [bx - @arr + @start],0x97
+mov cl,0x4
+
+inc dl
+mov di,dx
+
+
+jnp @bomb_sec
+
+
 @arr:
 db 0x00
 db 0x2e

@@ -1,15 +1,15 @@
 %define INTERVAL 0xF1
 %define TRUE_INTERVAL (INTERVAL - 0x4)
 %define JUMP_DIST 0x4000
-%define TOP_TRAP_DIST 0x12 ;(0x5 * 0x2)
-%define BOTTOM_TRAP_DIST  0x36 ; ((13 * 0x4) + 0x2)
+%define TOP_TRAP_DIST 0x12
+%define BOTTOM_TRAP_DIST 0x3B
 %define TRAP_VAL TRUE_INTERVAL
 %define SHARE_LOC 0xA7FB
 %define INIT_SI (0x2 + TOP_TRAP_DIST + (@main_loop_end - @main_loop) + BOTTOM_TRAP_DIST)
 %define BOMB_VAL 0xA593
 %define DIST_CALC (0xA2 + 0x10 -((@main_loop_end - @copy) + BOTTOM_TRAP_DIST))
 %define SAFETY_GAP 0x10
-%define DX_OFFSET 0x0
+%define DX_OFFSET 0x6
 
 
 add ax,@copy
