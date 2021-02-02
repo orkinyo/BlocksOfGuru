@@ -9,7 +9,7 @@
 %define BOMB_VAL 0xA593
 %define DIST_CALC (0xA2 + 0x4*0x4 -((@main_loop_end - @copy) + BOTTOM_TRAP_DIST))
 %define SAFETY_GAP 0x10
-%define DX_OFFSET 0x6
+%define DX_OFFSET 0x2
 
 
 add ax,@copy

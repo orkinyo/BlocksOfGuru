@@ -1,18 +1,20 @@
 ; AX = GARBAGE
 ; BX = ARRAY
-; CX = CHANGE XCHG ORDER (0x702)
+; CX = CHANGE XCHG ORDER (0x702) / CALL DI OPCODE
 ; DX = GARBAGE
 ; SI = GARBAGE
 ; DI = LOCATION FOR TAKING ZOMBIES
 ; BP = LOCATION FOR BOMBING / GARBAGE
-; SP = CALL DI OPCODE (SURVIVOR 2)
+; SP = INIT BP
 ; ES = ZOMBIE JUMP LOCATION
 ; SS = ARENA
 ; DS = ARENA
 ; CS = ARENA
 
-
+;; GENRAL DEFINES
 %define SHARE_LOC 0x9EC4
+;;
+;; ZOMBIE DEFINES
 %define CALL_DI_OPCODE 0x95FF
 
 %define SHL_WRITE_DIST 0x70
@@ -21,36 +23,28 @@
 %define LOOP_WRITE_DIST 0x72
 %define LOOP_CALL_ADDRESS 0x8346
 
-%define INIT_BP (CALL_DI_OPCODE - 0x8000)
-%define DELTA_BP (0x4100 - INIT_BP)
+%define INIT_BP 0xC7AF
+%define DELTA_BP (0xC100 - INIT_BP)
+;;
 
-xchg ax,bx
-add bx,@array
-lea di,[bx - @array + @init_loop]
-mov [SHARE_LOC],di
+add ax,@init_loop
+mov di,0x3FC
+stosw
 
-mov [bx-0x2],ss
+xchg si,[SHARE_LOC]
+push ax
+jmp si
 
-push cs
-pop ss
-
-lea bp,[bx + @zomb_start - @array]
-mov es,bp
-
-mov bp,INIT_BP
-mov sp,bp
-mov cl,0x24
-
-mov di,0x7E90
-
-@wait:
-loop @wait
-
-mov cx,CALL_DI_OPCODE
 
 @init_loop:
-mov [bp + DELTA_BP + 0x700],ds
+push cs
+pop ss
+mov cx,CALL_DI_OPCODE
+xor si,si
+mov sp,bp
+
 @loop:
+mov [bp + DELTA_BP + 0x700],ds
 mov [bp + DELTA_BP + 0x400],ds
 mov [bp + DELTA_BP + 0x600],ds
 mov [bp + DELTA_BP + 0x300],ds
@@ -102,27 +96,39 @@ mov si,ax
 mov [si + LOOP_WRITE_DIST],cx
 mov [LOOP_CALL_ADDRESS],es
 
-mov bp,sp
-mov cx,0x701
-add byte [bx - @array + @xchg1 + 0x3],cl
-add byte [bx - @array + @xchg2 + 0x3],cl
-and byte [bx - @array + @xchg3 + 0x3],ch
-and byte [bx - @array + @xchg4 + 0x3],ch
-add byte [bx - @array + @xchg3 + 0x3],cl
-add byte [bx - @array + @xchg4 + 0x3],cl
-jmp @jump_here
-@jump_back:
 inc di
+mov [SHL_CALL_ADDRESS],di
+mov [LOOP_CALL_ADDRESS],di
+jp @exit
 
-jnp @loop
+mov bp,sp
+inc byte [bx - @array + @xchg1 + 0x3]
+inc byte [bx - @array + @xchg2 + 0x3]
+and byte [bx - @array + @xchg3 + 0x3],0x7
+and byte [bx - @array + @xchg4 + 0x3],0x7
+inc byte [bx - @array + @xchg3 + 0x3]
+inc byte [bx - @array + @xchg4 + 0x3]
+cwd
 
+jmp @loop
 
+@exit:
+mov al,0x99
+xchg ax,[bx - 0x4]
 
-@jump_here:
-nop
-mov cx,CALL_DI_OPCODE
-jmp @jump_back
+cmp al,0x99
+jnz @skip_seg
 
+mov ax,[bx - 0x2]
+
+@skip_seg:
+mov ss,ax
+
+mov sp,0x3FA
+
+ret
+
+dw 0x0000
 dw 0x0000
 @array:
 db 0x00
@@ -381,6 +387,10 @@ db 0xe6
 db 0xc8
 db 0x6e
 db 0x40
-@zomb_start:
-
+@zomb_jump:
+mov [SHL_CALL_ADDRESS],di
+mov [LOOP_CALL_ADDRESS],di
+@our_location:
+mov ax,0xCCCC
+jmp ax
 @end:

@@ -1,34 +1,35 @@
 %define SHARE_LOC 0x9EC4
-%define CALL_DI_OPCODE 0x55FF
+%define CALL_DI_OPCODE 0x95FF
 
 %define SHL_WRITE_DIST 0x70
-%define SHL_CALL_ADDRESS 0xFFE2
+%define SHL_CALL_ADDRESS 0xF8E2
 
 %define LOOP_WRITE_DIST 0x72
-%define LOOP_CALL_ADDRESS 0x46
+%define LOOP_CALL_ADDRESS 0x8346
+
+%define INIT_BP CALL_DI_OPCODE
+%define DELTA_BP (0x4100 - INIT_BP)
+
 
 
 push cs
 pop ss
+mov cl,0x26
 
-xor ax,ax
-xchg si,[SHARE_LOC]
-lea bx,[si + 0x78]
+xchg [SHARE_LOC],si
+lea bx,[si + 0x8B]
 
-push si
-xor si,si
-
-mov bp,CALL_DI_OPCODE
+lea bp,[bx + 0x100]
 mov es,bp
 
-mov bp,0xC100
+mov bp,INIT_BP
+mov sp,bp
 
-mov cl,0x24
+mov di,0x7F90
 
 @wait:
 loop @wait
 
-mov ch,0x82
-mov di,cx
+mov cx,CALL_DI_OPCODE
 
-ret
+jmp si
