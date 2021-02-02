@@ -25,11 +25,10 @@ mov bp,0x4101
 mov sp,bp
 mov cl,0x24
 
+mov di,0x7F00
+
 @wait:
 loop @wait
-
-mov ch,0x81
-mov di,cx
 
 @loop:
 mov [bp + 0x700],bp
@@ -40,10 +39,10 @@ mov [bp],bp
 mov [bp + 0x100],bp
 mov [bp + 0x200],bp
 
-xchg dx,[di]
-xchg bp,[di + 0x200]
-xchg si,[di + 0x400]
-xchg ax,[di + 0x600]
+xchg dx,[di + 0x200]
+xchg bp,[di + 0x400]
+xchg si,[di + 0x600]
+xchg ax,[di + 0x800]
 
 xlatb
 xchg al,ah
