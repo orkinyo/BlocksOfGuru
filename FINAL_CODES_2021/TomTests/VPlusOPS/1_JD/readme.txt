@@ -1,0 +1,1 @@
+changed the zombies' jump distance to 0x5200
