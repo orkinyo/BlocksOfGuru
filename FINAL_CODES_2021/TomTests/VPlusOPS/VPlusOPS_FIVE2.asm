@@ -57,13 +57,13 @@ mov [bp + DELTA_BP + 0x100],ds
 mov [bp + DELTA_BP + 0x200],ds
 
 @xchg1:
-xchg dx,[di + 0x270]
+xchg dx,[di + 0x26F]
 @xchg2:
-xchg bp,[di + 0x470]
+xchg bp,[di + 0x46F]
 @xchg3:
-xchg si,[di + 0x670]
+xchg si,[di + 0x66F]
 @xchg4:
-xchg ax,[di + 0x870]
+xchg ax,[di + 0x86F]
 
 xlatb
 xchg al,ah
@@ -129,7 +129,7 @@ mov ax,[bx - 0x2]
 @skip_seg:
 mov ss,ax
 
-mov sp,0x3FA
+mov sp,0x7F8
 
 ret
 
@@ -392,10 +392,4 @@ db 0xe6
 db 0xc8
 db 0x6e
 db 0x40
-@zomb_jump:
-mov [SHL_CALL_ADDRESS],di
-mov [LOOP_CALL_ADDRESS],di
-@our_location:
-mov ax,0xCCCC
-jmp ax
 @end:

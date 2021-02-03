@@ -1,6 +1,6 @@
 ;; GENRAL DEFINES
 %define SHARE_LOC 0x9EC4
-%define CF_INIT_DI 0x7E90
+%define CF_INIT_DI (0x7E90 + 0x1)
 %define NT_INIT_DI (CF_INIT_DI + 0x100)
 %define CF_INIT_BP 0xC7AF
 %define NT_INIT_BP (0xC7AF - 0x8000)
@@ -24,7 +24,7 @@
 %define DIST_CALC (0xA2 + 0x4*0x4 -((@main_loop_end - @nt_copy) + BOTTOM_TRAP_DIST))
 %define SAFETY_GAP 0x10
 %define DX_OFFSET 0x2
-%define CL_PART1 0xC
+%define CL_PART1 0xE
 %define CL_PART2 ((@nt_copy_end - @nt_copy)/0x2 - CL_PART1)
 %define DI_PART1 (INIT_SI + (@nt_copy_end - @nt_copy) - CL_PART1*0x2)
 ;;
@@ -68,6 +68,7 @@ rep movsw
 lea di,[si - @cf_copy_end + @zombie_start - NT_INIT_BP - 0x3]
 
 ; mov ds,ax
+mov [si - @cf_copy_end + @get_es],di
 
 lea cx,[si + CF_JUMP_DIST]
 mov cl,0xA2
@@ -76,9 +77,9 @@ add bp,(CALL_DIST + 0x1)
 mov [bp],cx
 mov [bp + 0x2],dx
 
-mov sp,0x3FE
-
+push cs
 push bp
+push cs
 
 ;lea si,[bp + CALL_DIST + 0x1]
 
@@ -89,7 +90,6 @@ push bp
 
 
 @cf_zomb_prep:
-mov [SHARE_LOC],di
 @write_si:
 mov si,0xCCCC
 mov bp,CF_INIT_BP
@@ -99,18 +99,13 @@ lea bx,[si + ARRAY - INIT_LOOP]
 mov di,CF_INIT_DI
 
 mov [bx - 0x4],ss
-cwd
 
 call si
 @cf_ret:
 mov ds,ax
 
-push cs
 pop es
-
 pop bx
-
-push cs
 pop ss
 
 mov ax,bx
@@ -157,6 +152,8 @@ call far [bx]
 dw (CF_JUMP_DIST - (@cf_loop_end - @cf_loader) - 0x2)
 @cf_copy_end:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+@get_es:
+dw 0xCCCC
 @nt_start:
 mov [si - @nt_start + @write_si + 0x1],ax
 lea ax,[si + (@nt_copy - @nt_start) + DI_PART1 - INIT_SI]
@@ -174,34 +171,31 @@ mov di,DI_PART1
 mov cl,CL_PART1
 rep movsw
 
+mov es,[si - @nt_copy_end + @get_es]
+
 lea bx,[si - @nt_copy_end + NT_JUMP_DIST]
 pop si
 
 
 @nt_zomb_prep:
-mov ss,ax
-mov sp,0x400
+push ax
 push bx
 mov bl,((DIST_CALC - SAFETY_GAP)%(0x100)) + DX_OFFSET - 0x10
 add bx,bp
-
-xchg bp,[SHARE_LOC]
-mov es,bp
 
 push bx
 
 lea bx,[si + ARRAY - INIT_LOOP]
 mov di,NT_INIT_DI
 mov bp,NT_INIT_BP
-mov [bx - 0x2],ax
+mov [bx - 0x2],ss
 
 call si
 @nt_ret:
-
 pop dx
 pop si
 
-mov es,ax
+pop es
 
 push cs
 pop ss
@@ -215,13 +209,14 @@ rep movsw
 mov bx,dx
 add bx,(@main_loop - @nt_copy - TOP_TRAP_DIST - 0x2)
 
-push cs
-pop es
-
-mov ds,ax
+push es
+pop ds
 
 mov si,(INIT_SI + @reset_main_loop - @nt_copy - 0x2)
-mov [@main_loop_end - @nt_copy + INIT_SI + 0x8],ax
+mov [@main_loop_end - @nt_copy + INIT_SI + 0x8],es
+
+push cs
+pop es
 
 mov ax,BOMB_VAL
 
@@ -294,7 +289,12 @@ dw INIT_SI
 dw 0x1000
 @nt_copy_end:
 db 0x1
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 @zombie_start:
+mov [SHL_CALL_ADDRESS],di
+mov [LOOP_CALL_ADDRESS],di
 call @get_ip
 @get_ip:
 pop si
@@ -308,6 +308,7 @@ cmp dl,0x1
 jnz @wait
 
 xchg [si],dl
+;;
 
 mov cl,0xF
 div cx
