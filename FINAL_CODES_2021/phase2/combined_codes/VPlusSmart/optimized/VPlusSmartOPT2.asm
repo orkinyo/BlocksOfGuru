@@ -11,7 +11,7 @@
 %define DIST_CALC (0xA2 + 0x4*0x4 -((@main_loop_end - @copy) + BOTTOM_TRAP_DIST))
 %define SAFETY_GAP 0x10
 %define DX_OFFSET 0x2
-%define CL_PART1 0x18
+%define CL_PART1 0x1A
 %define CL_PART2 ((@copy_end - @copy)/0x2 - CL_PART1)
 %define SI_PART1 (CL_PART1*0x2)
 ;;
@@ -121,13 +121,13 @@ mov di,INIT_SI + @copy_end - @copy - SI_PART1
 
 lea dx,[si - @copy_end + JUMP_DIST]
 mov dl,((DIST_CALC - SAFETY_GAP)%(0x100)) + DX_OFFSET - 0x10
-xchg bp,[SHARE_LOC]
-add dx,bp
-
-push dx ; for end
 
 mov cl,CL_PART1
 rep movsw
+
+add dx,[SHARE_LOC]
+
+push dx ; for end
 
 ;; zombie section
 mov bp,0x8201
@@ -139,11 +139,13 @@ mov [si - @copy_end + @write_al + 0x4],bl
 xor si,si
 xchg bx,[SHARE_LOC]
 
+jmp @start_bomb
 
 @bomb_again:
 mov [0xC801],bp
 mov [0xC501],bp
 mov [0xC701],bp
+@start_bomb:
 mov [0xC401],bp
 mov [0xC101],bp
 mov [0xC201],bp

@@ -48,11 +48,6 @@ mov cl,(@copy_end - @copy)/0x2
 push ss
 pop es
 
-nop
-nop
-nop
-nop
-
 rep movsw
 
 add bp,(CALL_DIST + 0x1)
@@ -64,6 +59,11 @@ xchg [bp],ax
 xchg [bp+0x2],dx
 
 push bp ; for end
+
+nop
+nop
+nop
+nop
 
 @zomb_prep:
 mov [si - @copy_end + @write_ah + 0x3],bh
