@@ -10,10 +10,10 @@
 %define CALL_DI_OPCODE 0x55FF
 ;;
 ;; GENERAL DEFINES
-%define ZOMBIE_LOOP 0xD6
+%define ZOMBIE_LOOP 0xD9
 %define ZOMBIE_START 0x5
-%define ADD_XCHG 0xE9
-%define RESET_XCHG 0xF0
+%define ADD_XCHG 0xEC
+%define RESET_XCHG 0xF3
 ;;
 
 
@@ -128,7 +128,6 @@ les di,[bx]
 dec di
 
 lea sp,[di+bx]
-mov word [bx + (@loop_end - @copy)],(JUMP_DIST + CALL_DIST)
 
 movsw
 movsw
@@ -138,7 +137,7 @@ sub di,[bx+si]
 
 call far [bx]
 
-
+db 0x1
 @copy:
 @call_far:
 db 0x66
@@ -152,9 +151,7 @@ rep movsw
 @loop:
 add [bx],dx
 add di,[si]
-;lea sp,[di+bx]
-add sp,[bx+si]
-;
+lea sp,[di+bx]
 mov cl,(@loop_end - @loop)/0x2
 xor si,si
 movsw
@@ -164,6 +161,7 @@ call far [bx]
 @loop_end:
 dw (JUMP_DIST - (@loop_end - @loader) - 0x2)
 @copy_end:
+db 0x52
 @array:
 db 0x00
 db 0x2e
