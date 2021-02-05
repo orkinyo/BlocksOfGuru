@@ -29,10 +29,8 @@ lea si,[bx + ZOMBIE_LOOP]
 mov [bx + ZOMBIE_START + 0x1],ax
 mov [si + ADD_XCHG - ZOMBIE_LOOP + 0x2],si
 mov [si + RESET_XCHG - ZOMBIE_LOOP + 0x2],si
-add bx,ZOMBIE_START
 
 mov si,ax
-add si,@copy
 
 mov cl,0xF
 div cx
@@ -42,6 +40,9 @@ mov bp,dx
 mov cl,0x4
 shl bp,cl
 mov [SHARE_LOC],bp
+
+add bx,ZOMBIE_START
+add si,@copy
 
 mov cl,(@copy_end - @copy)/0x2
 push ss
@@ -128,7 +129,6 @@ les di,[bx]
 dec di
 
 lea sp,[di+bx]
-mov word [bx + (@loop_end - @copy)],(JUMP_DIST + CALL_DIST)
 
 movsw
 movsw
@@ -152,9 +152,7 @@ rep movsw
 @loop:
 add [bx],dx
 add di,[si]
-;lea sp,[di+bx]
-add sp,[bx+si]
-;
+lea sp,[di+bx]
 mov cl,(@loop_end - @loop)/0x2
 xor si,si
 movsw

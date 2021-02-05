@@ -119,10 +119,9 @@ mov es,ax
 
 mov di,INIT_SI + @copy_end - @copy - SI_PART1
 
-xchg bp,[SHARE_LOC]
-
 lea dx,[si - @copy_end + JUMP_DIST]
 mov dl,((DIST_CALC - SAFETY_GAP)%(0x100)) + DX_OFFSET - 0x10
+xchg bp,[SHARE_LOC]
 add dx,bp
 
 push dx ; for end
