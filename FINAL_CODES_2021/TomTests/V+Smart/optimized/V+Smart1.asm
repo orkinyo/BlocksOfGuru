@@ -10,37 +10,43 @@
 %define CALL_DI_OPCODE 0x55FF
 ;;
 ;; GENERAL DEFINES
-%define ZOMBIE_LOOP 0xD4
-%define ZOMBIE_START 0x5
-%define ADD_XCHG 0xE7
-%define RESET_XCHG 0xEE
-;;
+%define ZOMBIE_LOOP 0xE2
+%define ZOMBIE_START 0xB
+%define ADD_XCHG 0xF5
+%define RESET_XCHG 0xFC
+%define DIV_OFFSET 0x5
+%define AX_LES_OFFSET 0x7
 
+%define INT_86_DX 0xD7C4
+;;
 
 jmp @our_start
 
-@zombie_start:
-
-
-
 @our_start:
 xchg bx,[SHARE_LOC]
-lea si,[bx + ZOMBIE_LOOP]
-mov [bx + ZOMBIE_START + 0x1],bx
-mov [si + ADD_XCHG - ZOMBIE_LOOP + 0x2],si
-mov [si + RESET_XCHG - ZOMBIE_LOOP + 0x2],si
-
 mov si,ax
-
-mov cl,0xF
-div cx
+div word [bx + DIV_OFFSET]
 add dx,0xFF6
 
 mov bp,dx
 mov cl,(@copy_end - @copy)/0x2
 rcr bp,cl
-mov [SHARE_LOC],bp
+mov [bp + CALL_DIST + 0x1 + 0x2],dx
 
+les ax,[bx + AX_LES_OFFSET]
+mov dx,INT_86_DX
+lea di,[si - 0x100]
+int 0x86
+add di,@end
+int 0x86
+
+lea di,[bx + ZOMBIE_LOOP]
+add bx,ZOMBIE_START
+mov [bx + 0x1],si ; bx was here, mistake?
+mov [di + ADD_XCHG - ZOMBIE_LOOP + 0x2],di
+mov [di + RESET_XCHG - ZOMBIE_LOOP + 0x2],di
+
+xor di,di
 add si,@copy
 
 push ss
@@ -49,12 +55,11 @@ pop es
 rep movsw
 
 lea ax,[si + JUMP_DIST - @copy_end]
-add bp,(CALL_DIST + 0x1)
-
 mov al,0xA2
 
+add bp,CALL_DIST + 0x1
+mov [SHARE_LOC],bp
 xchg [bp],ax
-xchg [bp+0x2],dx
 
 push bp
 
@@ -65,16 +70,10 @@ mov bp,0x8101
 mov di,bp
 mov cl,0x4
 lea bx,[si-@copy_end+@array]
-nop
-nop
-nop
-nop
-nop
-nop
+; xor si,si
 mov [SHARE_LOC],bx
 
 @bomb_again:
-mov [0x4801],ds
 mov [0x4501],cs
 mov [0x4701],cs
 mov [0x4401],ds
@@ -108,9 +107,9 @@ mov cl,0x4
 inc bp
 mov di,bp
 
-jnp @bomb_again
+mov [0x4801],cs
 
-;; zomb section end
+jnp @bomb_again
 
 mov sp,0x7FE
 pop bx

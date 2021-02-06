@@ -1,97 +1,37 @@
-;; CALL FAR DEFINES
-%define JUMP_DIST 0x5200
-%define CALL_AMOUNT 0x84
-%define CALL_DIST (0x4 * CALL_AMOUNT)
-%define SHARE_LOC 0xA7FB
-;;
-;; ZOMBIE DEFINES
 %define ZOMB_CALL_ADDRESS 0xFF83
 %define ZOMB_WRITE_DIST 0x6C
 %define CALL_DI_OPCODE 0x55FF
-;;
-;; GENERAL DEFINES
-%define ZOMBIE_LOOP 0xD4
-%define ZOMBIE_START 0x5
-%define ADD_XCHG 0xE7
-%define RESET_XCHG 0xEE
-;;
 
 
-jmp @our_start
-
-@zombie_start:
-
-
-
-@our_start:
-xchg bx,[SHARE_LOC]
-lea si,[bx + ZOMBIE_LOOP]
-mov [bx + ZOMBIE_START + 0x1],bx
-mov [si + ADD_XCHG - ZOMBIE_LOOP + 0x2],si
-mov [si + RESET_XCHG - ZOMBIE_LOOP + 0x2],si
-
-mov si,ax
-
-mov cl,0xF
-div cx
-add dx,0xFF6
-
-mov bp,dx
-mov cl,(@copy_end - @copy)/0x2
-rcr bp,cl
-mov [SHARE_LOC],bp
-
-add si,@copy
-
-push ss
+push cs
 pop es
 
-rep movsw
+mov di,0x8101
+mov si,ax
+mov [si + @write_ah + 0x3],ah
+mov [si + @write_al + 0x4],al
+lea bx,[si + @array]
 
-lea ax,[si + JUMP_DIST - @copy_end]
-add bp,(CALL_DIST + 0x1)
+mov cl,0x30
 
-mov al,0xA2
+@wait:
+loop @wait
 
-xchg [bp],ax
-xchg [bp+0x2],dx
-
-push bp
-
-@zomb_prep:
-mov [si - @copy_end + @write_ah + 0x3],bh
-mov [si - @copy_end + @write_al + 0x4],bl
-mov bp,0x8101
-mov di,bp
 mov cl,0x4
-lea bx,[si-@copy_end+@array]
-nop
-nop
-nop
-nop
-nop
-nop
-mov [SHARE_LOC],bx
 
-@bomb_again:
-mov [0x4801],ds
-mov [0x4501],cs
-mov [0x4701],cs
-mov [0x4401],ds
-mov [0x4101],cs
-mov [0x4201],cs
-mov [0x4301],ds
+int 0x86
+sub di,0x100
+int 0x86
 
-@xchg:
-xchg sp,[di - 0x1]
-xchg dx,[di + 0x200 - 0x1]
-xchg si,[di + 0x400 - 0x1]
-xchg ax,[di + 0x600 - 0x1]
+xchg sp,[0x100]
+xchg dx,[0x200]
+xchg si,[0x300]
+xchg ax,[0x400]
 
-@zomb_loop:
+@loop:
 xchg ax,ax
 xlatb
-xchg ah,al
+xchg al,ah
 xlatb
 xor ah,al
 xchg di,ax
@@ -99,70 +39,10 @@ xchg di,ax
 mov word [di + ZOMB_WRITE_DIST + 0x2],0xFFCC
 @write_al:
 mov word [di + ZOMB_WRITE_DIST],0xCCB9
-add byte [bx - @array + @zomb_loop],0x2
-loop @zomb_loop
-
-mov byte [bx - @array + @zomb_loop],0x90
-mov cl,0x4
-
-inc bp
-mov di,bp
-
-jnp @bomb_again
-
-;; zomb section end
-
-mov sp,0x7FE
-pop bx
-
-push ss
-pop ds
-push cs
-pop ss
-
-mov ax,bx
-mov dx,JUMP_DIST
-mov cl,(@loop_end - @loop)/0x2
-xor si,si
-les di,[bx]
-dec di
-
-lea sp,[di+bx]
-
-movsw
-movsw
-
-mov word [bx+si],0x2
-sub di,[bx+si]
-
-call far [bx]
+add byte [bx -@array + @loop],0x2
+loop @loop
 
 
-@copy:
-@call_far:
-db 0x66
-call far [bx]
-db 0x68
-
-@loader:
-movsb
-movsw
-rep movsw
-@loop:
-add [bx],dx
-add di,[si]
-lea sp,[di+bx]
-mov cl,(@loop_end - @loop)/0x2
-xor si,si
-movsw
-movsw
-sub di,[bx+si]
-call far [bx]
-@loop_end:
-dw (JUMP_DIST - (@loop_end - @loader) - 0x2)
-@copy_end:
-dw 0x86D7
-dw 0x1000
 @array:
 db 0x00
 db 0x2e
@@ -420,5 +300,3 @@ db 0xe6
 db 0xc8
 db 0x6e
 db 0x40
-
-@end:
