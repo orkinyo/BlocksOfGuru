@@ -50,8 +50,7 @@ push ax
 xor dx,dx
 mov cx,0xF
 div cx
-add dx,0xFF6
-add dx,0x5
+add dx,(0xFF6+0x5)
 
 cmp dx,0x1005
 jb @skip_seg
