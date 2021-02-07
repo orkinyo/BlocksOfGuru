@@ -10,10 +10,10 @@
 %define CALL_DI_OPCODE 0x55FF
 ;;
 ;; GENERAL DEFINES
-%define ZOMBIE_LOOP 0xE2
+%define ZOMBIE_LOOP 0xDF
 %define ZOMBIE_START 0xB
-%define ADD_XCHG 0xF5
-%define RESET_XCHG 0xFC
+%define ADD_XCHG 0xF2
+%define RESET_XCHG 0xF9
 %define DIV_OFFSET 0x5
 %define AX_LES_OFFSET 0x7
 
