@@ -12,7 +12,7 @@ def replace_label(label_name : str, surv_index : int, value: str, line_index: in
     lines = line.split()
 
     #DEBUG
-    #print(lines)
+    #print(lines,f"{value=}")
     #DEBUG
 
     if len(lines) == 2:
@@ -28,8 +28,9 @@ def resolve_label(label_name : str,surv_index:int ):
     label_name = LB_actual_label_name"""
 
     lines = SURVSLINES[surv_index]
-    lines.append(f"mov ax, {label_name[3:].lower()}")
-    new_file_lines = "\n".join(lines)
+    lines.append(f"\nmov ax, @{label_name[3:].lower()}")
+    new_file_lines = "".join(lines)
+    lines.pop(-1)
 
     with open(nasm_input_file,"w") as f:
         f.write(new_file_lines)
@@ -72,8 +73,12 @@ def fix_lables(file_index : int):
                 define_lables.append(line[1])
                 define_indexes.append(idx)
 
+                #DEBUG
+                #print(f"found: {' '.join(line)}")
+                #DEBUG
+
     #DEBUG
-    #Lprint(f"\n\nFound {len(define_lables)} lables to fix\n\n")
+    #print(f"\n\nFound {len(define_lables)} lables to fix in {SURVIVORS[file_index]}\n\n")
     #DEBUG
 
     for i,label in enumerate(define_lables):
