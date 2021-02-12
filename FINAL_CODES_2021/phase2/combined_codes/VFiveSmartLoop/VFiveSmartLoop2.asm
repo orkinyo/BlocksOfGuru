@@ -21,7 +21,7 @@ db 0xF
 db 0x0
 @ax_les_offset:
 dw AX_INT_86
-dw 0x0010
+dw 0x1000
 
 
 @our_start:

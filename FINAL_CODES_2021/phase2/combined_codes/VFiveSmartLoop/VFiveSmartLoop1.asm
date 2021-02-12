@@ -7,12 +7,13 @@
 %define SHARE_LOC 0x8101
 
 %define ZOMB_WRITE_DIST 0x6C
-%define LB_ZOMB_START 0xFD
-%define LB_WRITE_AX 0x21
-%define LB_WRITE_SEG 0xF
-%define LB_DIV_OFFEST 0x10
-%define LB_AX_LES_OFFEST 0x10
 %define DX_INT_86 0xD7C4
+%define LB_ZOMB_START 0xFD
+%define LB_WRITE_AX 0x27
+%define LB_WRITE_SEG 0x15
+%define LB_DIV_OFFEST 0x05
+%define LB_AX_LES_OFFEST 0x7
+
 
 
 jmp @our_start
@@ -26,11 +27,8 @@ add dx,0xFF6
 
 mov [bx+LB_WRITE_SEG+0x1],dx
 
-mov [bp + 0x100 + 0x2],dx
-mov bp,dx
-mov cl,(@copy_end - @copy)/0x2
-rcr bp,cl
-sub bp,CALL_DIST
+mov bp,0x100
+mov [bp + 0x2],dx
 
 les ax,[bx + LB_AX_LES_OFFEST]
 mov dx, DX_INT_86
@@ -44,19 +42,21 @@ add si,@copy
 push ss
 pop es
 
-rep movsw
+mov cl,(@copy_end-@copy)/0x2
 
 lea ax,[si + JUMP_DIST - @copy_end]
 add [bx+LB_WRITE_AX+0x1],ax
+
+rep movsw
+
+
 mov al,0xA7
 
 
-push bp
-mov bp,0x100 ;; 
+
 push bp
 mov [bp],ax
 
-mov word [bp+di-0x100],(JUMP_DIST - (@loop_end - @loop) - 0x2 - 0x4)
 add word [bp+di],JUMP_DIST - GAP - CALL_DIST
 mov word [bp + (@loop - @copy)],GAP
 
@@ -70,9 +70,6 @@ mov [si-@copy_end+@write_ah+0x3],bh
 mov [si-@copy_end+@write_al+0x4],bl
 mov bp,di
 mov cl,0x4
-cwd
-cwd
-cwd
 lea bx,[si-@copy_end+@array]
 mov [SHARE_LOC],bx
 @bomb_sec:
@@ -86,10 +83,10 @@ mov [0x4301],ds
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 @xchg:
-xchg sp,[di - 0x1A + 0x8100]
-xchg dx,[di - 0x1A + 0x8300]
-xchg ax,[di - 0x1A + 0x8500]
-xchg si,[di - 0x1A + 0x8700]
+xchg sp,[di - 0x1C + 0x8100]
+xchg dx,[di - 0x1C + 0x8300]
+xchg ax,[di - 0x1C + 0x8500]
+xchg si,[di - 0x1C + 0x8700]
 
 ; registers order: ax,dx,sp,si
 @start:
@@ -116,19 +113,22 @@ mov di,bp
 jp @bomb_sec
 ;
 
-mov sp,0x7FC
+mov sp,0x7FE
 pop bx
-pop bp
 push ss
 pop ds
 push cs
 pop ss
 
+mov bp,[bx+0x2]
+mov cl,0x4
+shl bp,cl
+
 mov dx,JUMP_DIST
 mov cl,(@loop_end - @loop)/0x2
 mov ax,0xA5F3
 les di,[bx]
-lea sp,[di + bp + 0x2]
+lea sp,[di + bp + 0x2 - CALL_DIST]
 dec di
 xor si,si
 xor bp,bp
@@ -161,7 +161,7 @@ dec bp
 db 0x75
 call far [bx]
 @loop_end:
-
+dw (JUMP_DIST - (@loop_end - @loop) - 0x2 - 0x4)
 @copy_end:
 
 @array:
