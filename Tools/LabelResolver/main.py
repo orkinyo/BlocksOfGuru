@@ -38,8 +38,10 @@ def resolve_label(label_name : str,surv_index:int ):
     os.system(f"nasm {nasm_input_file} -o {nasm_output_file}")
     with open(nasm_output_file,"rb") as f:
         resolve_data = f.read()
-    os.system(f"del {nasm_input_file}")
-    os.system(f"del {nasm_output_file}")
+    #os.system(f"del {nasm_input_file}")
+    #os.system(f"del {nasm_output_file}")
+    os.remove(f"{os.getcwd()}\\{nasm_output_file}")
+    os.remove(f"{os.getcwd()}\\{nasm_input_file}")
     value = resolve_data[-3:]
 
     #DEBUG
