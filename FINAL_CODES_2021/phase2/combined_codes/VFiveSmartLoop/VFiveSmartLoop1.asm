@@ -11,8 +11,8 @@
 %define LB_ZOMB_START 0xFD
 %define LB_WRITE_AX 0x27
 %define LB_WRITE_SEG 0x15
-%define LB_DIV_OFFEST 0x05
-%define LB_AX_LES_OFFEST 0x7
+%define LB_DIV_OFFSET 0x05
+%define LB_AX_LES_OFFSET 0x7
 
 
 
@@ -22,7 +22,7 @@ jmp @our_start
 @our_start:
 xchg bx,[SHARE_LOC]
 mov si,ax
-div word [bx + LB_DIV_OFFEST]
+div word [bx + LB_DIV_OFFSET]
 add dx,0xFF6
 
 mov [bx+LB_WRITE_SEG+0x1],dx
@@ -30,7 +30,7 @@ mov [bx+LB_WRITE_SEG+0x1],dx
 mov bp,0x100
 mov [bp + 0x2],dx
 
-les ax,[bx + LB_AX_LES_OFFEST]
+les ax,[bx + LB_AX_LES_OFFSET]
 mov dx, DX_INT_86
 lea di,[si-0x100]
 int 0x86
