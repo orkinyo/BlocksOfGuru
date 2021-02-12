@@ -86,7 +86,7 @@ def fix_lables(file_index : int):
     for i,label in enumerate(define_lables):
         line_idx_in_surv_to_fix = define_indexes[i]
         define_value = resolve_label(label,file_index-1)
-        replace_label(label,file_index,f"{define_value}",line_idx_in_surv_to_fix)
+        replace_label(label,file_index,f"{hex(define_value)}",line_idx_in_surv_to_fix)
 
 
 
@@ -105,6 +105,10 @@ def create_survivor_names(surv_name : str):
         sys.exit(1)
     if surv_name_no_file_ext.endswith("1"):
 
+        #DEBUG
+        print("file name ends with 1")
+        #DEBUG
+
         if not os.path.exists(surv_name_no_file_ext[:-1]+"2.asm"):
             print(f"CANT FIND FILE {surv_name_no_file_ext[:-1]+'2.asm'}")
             sys.exit()
@@ -115,6 +119,10 @@ def create_survivor_names(surv_name : str):
         return
 
     if surv_name_no_file_ext.endswith("2"):
+
+        # DEBUG
+        print("file name ends with 2")
+        # DEBUG
 
         if not os.path.exists(surv_name_no_file_ext[:-1] + "1.asm"):
             print(f"CANT FIND FILE {surv_name_no_file_ext[:-1] + '1.asm'}")
