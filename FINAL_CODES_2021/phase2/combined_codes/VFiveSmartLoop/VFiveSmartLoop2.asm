@@ -37,13 +37,12 @@ nop
 mov dx,0xCCCC
 
 mov bp,dx
-mov cx,(@copy_end - @copy)/0x2
+mov cx,(@copy_end - @copy)/0x2 -0x1
 rcr bp,cl
 sub bp,CALL_DIST
 
-
 rep movsw
-
+movsw
 
 pop es
 push bp
@@ -59,8 +58,7 @@ push bp
 mov [bp],ax
 mov word [bp+0x2],dx
 
-mov word [bp+di-0x100],(JUMP_DIST - (@loop_end - @loop) - 0x2 - 0x4)
-add word [bp+di],JUMP_DIST - GAP - CALL_DIST
+add word [bp+di-0x2],JUMP_DIST - GAP - CALL_DIST
 mov word [bp + (@loop - @copy)],GAP
 
 
@@ -73,9 +71,9 @@ mov [si-@copy_end+@write_al+0x4],bl
 add si,@start-@copy_end
 mov [si-@start+@add_xchg+0x2],si
 mov [si-@start+@reset_xchg+0x2],si
+dec di
 mov bp,di
 mov cl,0x4
-cwd
 cwd
 xchg bx,[SHARE_LOC]
 @bomb_sec:
@@ -89,10 +87,10 @@ mov [0xC301],ds
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 @xchg:
-xchg sp,[di - 0x1A + 0x8200]
-xchg dx,[di - 0x1A + 0x8400]
-xchg ax,[di - 0x1A + 0x8600]
-xchg si,[di - 0x1A + 0x8800]
+xchg sp,[di - 0x1B + 0x8200]
+xchg dx,[di - 0x1B + 0x8400]
+xchg ax,[di - 0x1B + 0x8600]
+xchg si,[di - 0x1B + 0x8800]
 
 ; registers order: ax,dx,sp,si
 @start:
@@ -117,7 +115,7 @@ inc bp
 mov di,bp
 
 
-jp @bomb_sec
+jnp @bomb_sec
 xor si,si
 mov sp,0x7FC
 jmp @skip_zomb_counter
@@ -172,6 +170,7 @@ dec bp
 db 0x75
 call far [bx]
 @loop_end:
+dw (JUMP_DIST - (@loop_end - @loop) - 0x2 - 0x4)
 
 @copy_end:
 

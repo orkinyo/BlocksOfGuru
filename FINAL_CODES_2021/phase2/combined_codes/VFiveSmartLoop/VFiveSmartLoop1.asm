@@ -8,10 +8,10 @@
 
 %define ZOMB_WRITE_DIST 0x6C
 %define DX_INT_86 0xD7C4
-%define LB_ZOMB_START 0xFD
-%define LB_WRITE_AX 0x27
+%define LB_ZOMB_START 0xFB
+%define LB_WRITE_AX 0x28
 %define LB_WRITE_SEG 0x15
-%define LB_DIV_OFFSET 0x05
+%define LB_DIV_OFFSET 0x5
 %define LB_AX_LES_OFFSET 0x7
 
 
@@ -57,7 +57,7 @@ mov al,0xA7
 push bp
 mov [bp],ax
 
-add word [bp+di],JUMP_DIST - GAP - CALL_DIST
+add word [bp+di-0x2],JUMP_DIST - GAP - CALL_DIST
 mov word [bp + (@loop - @copy)],GAP
 
 push cs
@@ -68,12 +68,12 @@ pop es
 add bx,LB_ZOMB_START
 mov [si-@copy_end+@write_ah+0x3],bh
 mov [si-@copy_end+@write_al+0x4],bl
+dec di
 mov bp,di
-mov cl,0x4
 lea bx,[si-@copy_end+@array]
 mov [SHARE_LOC],bx
+mov cl,0x4
 @bomb_sec:
-mov [0x4801],ds
 mov [0x4501],ds
 mov [0x4701],ds
 mov [0x4401],ds
@@ -83,10 +83,10 @@ mov [0x4301],ds
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 @xchg:
-xchg sp,[di - 0x1C + 0x8100]
-xchg dx,[di - 0x1C + 0x8300]
-xchg ax,[di - 0x1C + 0x8500]
-xchg si,[di - 0x1C + 0x8700]
+xchg sp,[di - 0x1B + 0x8100]
+xchg dx,[di - 0x1B + 0x8300]
+xchg ax,[di - 0x1B + 0x8500]
+xchg si,[di - 0x1B + 0x8700]
 
 ; registers order: ax,dx,sp,si
 @start:
@@ -108,9 +108,9 @@ mov cl,0x4
 
 inc bp
 mov di,bp
+nop
 
-
-jp @bomb_sec
+jnp @bomb_sec
 ;
 
 mov sp,0x7FE
