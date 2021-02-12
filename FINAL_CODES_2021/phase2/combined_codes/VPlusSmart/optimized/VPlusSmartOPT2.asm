@@ -11,7 +11,7 @@
 %define DIST_CALC (0xA2 + 0x4*0x4 -((@main_loop_end - @copy) + BOTTOM_TRAP_DIST))
 %define SAFETY_GAP 0x10
 %define DX_OFFSET 0x2
-%define CL_PART1 0x18
+%define CL_PART1 0x19
 %define CL_PART2 ((@copy_end - @copy)/0x2 - CL_PART1)
 %define SI_PART1 (CL_PART1*0x2)
 ;;
@@ -21,15 +21,10 @@
 %define CALL_DI_OPCODE 0x55FF
 ;;
 ;; GENRAL DEFINES
-%define CF_COPY_LABEL 0xCC
-%define ZOMB_CL_COPY 0xB
-%define ZOMB_CL_LOOP 0x9
-%define ZOMB_CL_CHANGE 0xC
 %define CALL_AMOUNT 0x84
 %define CALL_DIST (0x4 * CALL_AMOUNT)
 %define CF_JUMP_DIST 0x5200
 %define ROWS_GAP 0x0
-%define DEC_BP_JZ_OPODE 0x754D
 %define ZOMBIE_COUNTER 0x80
 ;;
 
@@ -39,51 +34,46 @@ jmp @our_start
 
 @zombie_start:
 mov ax,0xCCCC
-mov si,ax
-add si,CF_COPY_LABEL
-
-xor dx,dx
-@zomb_wait:
-xchg dl,[si-0x1]
-
-cmp dl,0x1
-jnz @zomb_wait
-
-xchg dl,[si-0x1]
 
 push ax
 
+xor dx,dx
 mov cx,0xF
 div cx
 add dx,0xFF6
+
+call @get_ip
+@get_ip:
+pop si
+add si,(@cf_copy - @get_ip)
+
+@zomb_wait:
+xchg ch,[si-0x1]
+
+cmp ch,0x1
+jnz @zomb_wait
+
+xchg ch,[si-0x1]
 
 mov bp,dx
 mov cl,0x4
 shl bp,cl
 
-mov cl,ZOMB_CL_COPY
+mov cl,(@cf_copy_end - @cf_copy)/0x2
 push ss
 pop es
 
 rep movsw
 
-mov ax,DEC_BP_JZ_OPODE
-stosw
-movsw
-movsw
-
-pop ax
-
 lea bx,[bp + CALL_DIST + 0x1]
-add byte [si],(ROWS_GAP + 0x3)
-add ah,[si]
+pop ax
+add byte [si - @cf_copy_end + @add_jd + 0x2],(ROWS_GAP + 0x3)
+@add_jd:
+add ah,(CF_JUMP_DIST/0x100)
 mov al,0xA2
 
 push ss
 pop ds
-
-inc byte [di - ZOMB_CL_CHANGE + 0x1 - 0x2]
-sub word [di-0x2],0x2
 
 mov [bx],ax
 mov [bx+0x2],dx
@@ -95,13 +85,14 @@ pop ss
 
 mov ax,bx
 mov dx,CF_JUMP_DIST
-mov cl,ZOMB_CL_LOOP
+mov cl,(@cf_loop_end - @cf_loop)/0x2
 xor si,si
 les di,[bx]
 dec di
 mov bp,ZOMBIE_COUNTER
 
 lea sp,[di+bx]
+mov word [bx + (@cf_loop_end - @cf_copy)],(CF_JUMP_DIST + CALL_DIST)
 
 movsw
 movsw
@@ -111,6 +102,9 @@ sub di,[bx+si]
 
 call far [bx]
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 @our_start:
 add ax,@copy_end - SI_PART1
 mov si,ss
@@ -125,16 +119,15 @@ mov es,ax
 
 mov di,INIT_SI + @copy_end - @copy - SI_PART1
 
-xchg bp,[SHARE_LOC]
-
 lea dx,[si - @copy_end + JUMP_DIST]
 mov dl,((DIST_CALC - SAFETY_GAP)%(0x100)) + DX_OFFSET - 0x10
-add dx,bp
+add dx,[SHARE_LOC]
 
-push dx ; for end
 
 mov cl,CL_PART1
 rep movsw
+
+push dx ; for end
 
 ;; zombie section
 mov bp,0x8201
@@ -145,7 +138,6 @@ mov [si - @copy_end + @write_ah + 0x3],bh
 mov [si - @copy_end + @write_al + 0x4],bl
 xor si,si
 xchg bx,[SHARE_LOC]
-
 
 @bomb_again:
 mov [0xC801],bp
@@ -285,4 +277,29 @@ dw TRAP_VAL
 dw INIT_SI
 dw 0x1000
 @copy_end:
+db 0x1
+@cf_copy:
+@call_far:
+db 0x66
+call far [bx]
+db 0x68
 
+@cf_loader:
+movsb
+movsw
+rep movsw
+@cf_loop:
+add [bx],dx
+add di,[si]
+add sp,[bx+si]
+mov cl,(@cf_loop_end - @cf_loop)/0x2
+xor si,si
+movsw
+movsw
+sub di,[bx+si]
+dec bp
+db 0x75
+call far [bx]
+@cf_loop_end:
+dw (CF_JUMP_DIST - (@cf_loop_end - @cf_loader) - 0x2)
+@cf_copy_end:

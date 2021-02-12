@@ -11,7 +11,7 @@
 %define DIST_CALC (0xA2 + 0x4*0x4 -((@main_loop_end - @copy) + BOTTOM_TRAP_DIST))
 %define SAFETY_GAP 0x10
 %define DX_OFFSET 0x2
-%define CL_PART1 0x18
+%define CL_PART1 0x1A
 %define CL_PART2 ((@copy_end - @copy)/0x2 - CL_PART1)
 %define SI_PART1 (CL_PART1*0x2)
 ;;
@@ -23,14 +23,24 @@
 ;; GENRAL DEFINES
 %define CALL_AMOUNT 0x84
 %define CALL_DIST (0x4 * CALL_AMOUNT)
-%define CF_JUMP_DIST 0x5200
-%define ROWS_GAP 0x0
+%define CF_JUMP_DIST 0xC600
+%define ROWS_GAP 0x1
 %define ZOMBIE_COUNTER 0x80
+
+%define AX_XLATB 0x86D7
+%define ARENA_SEG 0x1000
 ;;
 
 
 mov [SHARE_LOC],ax
 jmp @our_start
+
+@div_offset:
+db 0xF
+db 0x0
+@ax_les_offset:
+dw AX_XLATB
+dw ARENA_SEG
 
 @zombie_start:
 mov ax,0xCCCC
@@ -40,7 +50,14 @@ push ax
 xor dx,dx
 mov cx,0xF
 div cx
-add dx,0xFF6
+add dx,(0xFF6+0x5)
+
+cmp dx,0x1005
+jb @skip_seg
+
+sub dx,0xF
+
+@skip_seg:
 
 call @get_ip
 @get_ip:
@@ -119,16 +136,15 @@ mov es,ax
 
 mov di,INIT_SI + @copy_end - @copy - SI_PART1
 
-xchg bp,[SHARE_LOC]
-
 lea dx,[si - @copy_end + JUMP_DIST]
 mov dl,((DIST_CALC - SAFETY_GAP)%(0x100)) + DX_OFFSET - 0x10
-add dx,bp
-
-push dx ; for end
 
 mov cl,CL_PART1
 rep movsw
+
+add dx,[SHARE_LOC]
+
+push dx ; for end
 
 ;; zombie section
 mov bp,0x8201
@@ -140,9 +156,7 @@ mov [si - @copy_end + @write_al + 0x4],bl
 xor si,si
 xchg bx,[SHARE_LOC]
 
-
 @bomb_again:
-mov [0xC801],bp
 mov [0xC501],bp
 mov [0xC701],bp
 mov [0xC401],bp
@@ -159,7 +173,7 @@ xchg ax,[di + 0x600 - 0x1]
 @zombie_loop:
 xchg ax,ax
 xlatb
-xchg ah,al
+xchg al,ah
 xlatb
 xor ah,al
 mov di,ax
@@ -177,6 +191,8 @@ mov cl,0x4
 
 inc bp
 mov di,bp
+
+mov [0xC801],cs
 
 jnp @bomb_again
 

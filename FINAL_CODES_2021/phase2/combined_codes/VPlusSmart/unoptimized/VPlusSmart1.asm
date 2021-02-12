@@ -10,10 +10,10 @@
 %define CALL_DI_OPCODE 0x55FF
 ;;
 ;; GENERAL DEFINES
-%define ZOMBIE_LOOP 0xD9
+%define ZOMBIE_LOOP 0xD6
 %define ZOMBIE_START 0x5
-%define ADD_XCHG 0xEC
-%define RESET_XCHG 0xF3
+%define ADD_XCHG 0xE9
+%define RESET_XCHG 0xF0
 ;;
 
 
@@ -29,10 +29,8 @@ lea si,[bx + ZOMBIE_LOOP]
 mov [bx + ZOMBIE_START + 0x1],ax
 mov [si + ADD_XCHG - ZOMBIE_LOOP + 0x2],si
 mov [si + RESET_XCHG - ZOMBIE_LOOP + 0x2],si
-add bx,ZOMBIE_START
 
 mov si,ax
-add si,@copy
 
 mov cl,0xF
 div cx
@@ -43,14 +41,12 @@ mov cl,0x4
 shl bp,cl
 mov [SHARE_LOC],bp
 
+add bx,ZOMBIE_START
+add si,@copy
+
 mov cl,(@copy_end - @copy)/0x2
 push ss
 pop es
-
-nop
-nop
-nop
-nop
 
 rep movsw
 
@@ -63,6 +59,11 @@ xchg [bp],ax
 xchg [bp+0x2],dx
 
 push bp ; for end
+
+nop
+nop
+nop
+nop
 
 @zomb_prep:
 mov [si - @copy_end + @write_ah + 0x3],bh
@@ -137,7 +138,7 @@ sub di,[bx+si]
 
 call far [bx]
 
-db 0x1
+
 @copy:
 @call_far:
 db 0x66
@@ -161,7 +162,6 @@ call far [bx]
 @loop_end:
 dw (JUMP_DIST - (@loop_end - @loader) - 0x2)
 @copy_end:
-db 0x52
 @array:
 db 0x00
 db 0x2e
