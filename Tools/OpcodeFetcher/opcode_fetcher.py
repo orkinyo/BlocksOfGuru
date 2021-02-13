@@ -35,34 +35,41 @@ def get_all_opcodes(inst):
 
 def main():
     global instruction
-    if instruction is None:
-        print("give me an instruction:")
-        instruction = input()
+    while True:
+    
+        if instruction is None:
+            print("give me an instruction:")
+            instruction = input()
+        
+        if instruction == "exit":
+            return
+        
+        default_opcode, inst = get_instruction_details(instruction)
+        # print(f"{inst=}")
 
-    default_opcode, inst = get_instruction_details(instruction)
-    # print(f"{inst=}")
+        all_opcodes = get_all_opcodes(inst)
 
-    all_opcodes = get_all_opcodes(inst)
+        w = "".join([hex(i)[2:].upper() for i in default_opcode])
+        # print(w)
 
-    w = "".join([hex(i)[2:].upper() for i in default_opcode])
-    # print(w)
+        for line in all_opcodes:
+            if line.startswith(w):
+                print("The default opcode is:")
+                print(line)
+                default_line = line
+                break
 
-    for line in all_opcodes:
-        if line.startswith(w):
-            print("The default opcode is:")
-            print(line)
-            default_line = line
-            break
-
-    print("The alternative opcodes are:")
-    for line in all_opcodes:
-        if line != default_line:
-            opcode = line.split()[0]
-            if len(opcode) == 4:
-                opcode = "dw 0x" + opcode[2:4] + opcode[:2]
-            else:
-                opcode = "db 0x" + opcode
-            print(line.strip() + "\t\t" + opcode)
+        print("The alternative opcodes are:")
+        for line in all_opcodes:
+            if line != default_line:
+                opcode = line.split()[0]
+                if len(opcode) == 4:
+                    opcode = "dw 0x" + opcode[2:4] + opcode[:2]
+                else:
+                    opcode = "db 0x" + opcode
+                print(line.strip() + "\t\t" + opcode)
+        print("\n")
+        instruction = None
 
 
 if __name__ == "__main__":

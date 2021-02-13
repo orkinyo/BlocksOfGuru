@@ -17,6 +17,13 @@
 ;; ZOMBIE DEFINES
 %define ZOMB_WRITE_DIST 0x6C
 %define ZOMB_SEG_DIFF 0x5
+%define ZOMB_INT_87_AX 0x86D7
+%define ZOMB_INT_87_DX 0xD7C4
+%define CALL_DI_SHL_BYTE 0xFFE2
+%define CALL_DI_SHL_WORD 0xF8E2
+%define CALL_DI_LOOP_BYTE 0x46
+%define CALL_DI_LOOP_WORD 0x8346
+
 ;;
 ;; GENRAL DEFINES
 %define CALL_AMOUNT 0x84
@@ -31,6 +38,9 @@
 %define SHARE_LOC 0xA7FB
 %define SHARE_LOC_1 0x8701
 %define SHARE_LOC_2 0x8801
+
+%define INT_87_AX 0xCCCC
+%define INT_87_DX 0x29CC
 ;;
 
 
@@ -45,12 +55,22 @@ dw AX_XLATB
 dw ARENA_SEG
 
 @zombie_start:
+mov di,[CALL_DI_SHL_WORD]
+int 0x86
+mov di,[CALL_DI_LOOP_WORD]
+int 0x86
+
+mov ax,ZOMB_INT_87_AX
+mov dx,ZOMB_INT_87_DX
+mov cx,0xF
+int 0x87
+
+@write_ax:
 mov ax,0xCCCC
 
 push ax
 
 xor dx,dx
-mov cx,0xF
 div cx
 add dx,(0xFF6+ZOMB_SEG_DIFF)
 
@@ -80,6 +100,7 @@ rcr bp,cl
 
 push ss
 pop es
+xor di,di
 
 rep movsw
 movsw
@@ -175,10 +196,10 @@ xchg ax,[di + 0x600 - 0x1]
 @zombie_loop:
 xchg ax,ax
 xlatb
-xchg al,ah
+xchg ah,al
 xlatb
 xor ah,al
-mov di,ax
+xchg di,ax
 @write_ah:
 mov word [di + ZOMB_WRITE_DIST + 0x2],0xFFCC
 @write_al:
@@ -201,7 +222,7 @@ jnp @bomb_again
 
 ;; zombie section end
 
-pop dx ; for end
+pop bx ; for end
 pop si ; for end
 
 mov cl,CL_PART2
@@ -212,27 +233,37 @@ rep movsw
 push es
 pop ds
 
-mov bx,dx
+push cs
+pop es
+
+mov di,[0x0000]
+int 0x86
+xor di,di
+int 0x86
+
 add bx,(@main_loop - @copy - TOP_TRAP_DIST - 0x2)
 
 mov si,(INIT_SI + @reset_main_loop - @copy - 0x2)
 
-mov [@main_loop_end - @copy + INIT_SI + 0x8],es
+mov [@main_loop_end - @copy + INIT_SI + 0x8],ds
 
-push cs
-pop es
+mov cl,((@main_loop_end - @reset_main_loop)/0x2)
+
 
 push cs
 pop ss
-
-mov ax,BOMB_VAL
-
-lea di,[bx + 0x2 + TOP_TRAP_DIST - (@reset_main_loop_end - @reset_main_loop) - 0x2]
 lea sp,[bx + INIT_SI + 0x2]
 
-mov bp,di
-mov cl,((@main_loop_end - @reset_main_loop)/0x2)
 
+mov ax,INT_87_AX
+mov dx,INT_87_DX
+int 0x87
+
+mov ax,BOMB_VAL
+lea dx,[bx-(@main_loop - @copy - TOP_TRAP_DIST - 0x2)]
+lea di,[bx + 0x2 + TOP_TRAP_DIST - (@reset_main_loop_end - @reset_main_loop) - 0x2]
+
+mov bp,di
 movsw
 jmp bp
 

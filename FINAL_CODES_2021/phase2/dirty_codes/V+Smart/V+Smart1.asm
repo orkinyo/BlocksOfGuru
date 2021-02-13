@@ -7,17 +7,21 @@
 %define ZOMB_WRITE_DIST 0x6C
 ;;
 ;; GENERAL DEFINES
-%define LB_ZOMBIE_LOOP 0xD6
-%define LB_ZOMBIE_START 0xB
-%define LB_ADD_XCHG 0xE9
-%define LB_RESET_XCHG 0xF0
-%define LB_DIV_OFFSET 0x5
-%define LB_AX_LES_OFFSET 0x7
+%define LB_ZOMBIE_LOOP 0xED
+%define LB_ZOMBIE_START 0xC
+%define LB_WRITE_AX 0x23
+%define LB_ADD_XCHG 0xFF
+%define LB_RESET_XCHG 0x106
+%define LB_DIV_OFFSET 0x6
+%define LB_AX_LES_OFFSET 0x8
 
 %define SHARE_LOC 0xA7FB
 %define SHARE_LOC_1 0x8701
 %define SHARE_LOC_2 0x8801
-%define INT_86_DX 0xD7C4
+%define INT_86_DX 0xD7E0
+
+%define INT_87_AX 0xCCCC
+%define INT_87_DX 0x29CC
 ;;
 
 jmp @our_start
@@ -43,7 +47,7 @@ int 0x86
 
 lea di,[bx + LB_ZOMBIE_LOOP]
 add bx,LB_ZOMBIE_START
-mov [bx + 0x1],si ; bx was here, mistake?
+mov [bx - LB_ZOMBIE_START + LB_WRITE_AX+ 0x1],si 
 mov [di + LB_ADD_XCHG - LB_ZOMBIE_LOOP + 0x2],di
 mov [di + LB_RESET_XCHG - LB_ZOMBIE_LOOP + 0x2],di
 
@@ -121,14 +125,22 @@ pop ds
 push cs
 pop ss
 
-mov ax,bx
-mov dx,JUMP_DIST
 mov cl,(@loop_end - @loop)/0x2
 xor si,si
+
+push cs
+pop es
+
+mov ax,INT_87_AX
+mov dx,INT_87_DX
+int 0x87
+
+mov ax,bx
+mov dx,JUMP_DIST
 les di,[bx]
 dec di
-
 lea sp,[di+bx]
+
 
 movsw
 movsw
