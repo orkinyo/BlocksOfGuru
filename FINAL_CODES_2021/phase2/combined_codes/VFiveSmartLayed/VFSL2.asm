@@ -27,7 +27,7 @@
 %define INIT_BP 0xC7AF
 %define DELTA_BP (0xC100 - INIT_BP)
 ;;
-%define JUMP_DIST 0x5200
+%define JUMP_DIST 0xF900
 %define CALL_AMOUNT 0x55
 %define GAP 0x19
 %define CALL_DIST (CALL_AMOUNT * (GAP - 0x4) - 0x4)
