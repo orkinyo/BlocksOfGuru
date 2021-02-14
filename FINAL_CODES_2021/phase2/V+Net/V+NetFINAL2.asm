@@ -52,6 +52,7 @@ mov [SHARE_LOC],ax
 jmp @our_start
 
 @top_decoy:
+cwd
 xlatb
 xchg ah,al
 xlatb
@@ -249,7 +250,7 @@ loop @zomb_loop
 
 ;; zombie section end
 
-mov bx,dx
+dw 0xDA8B ; mov bx,dx
 mov cl,CL_PART2
 pop si ; for end
 
@@ -315,7 +316,7 @@ mov word [bp+di-0x2],ax
 add sp,(-0x3)
 dec ch
 jnz @anti_loop
-mov di,bx
+dw 0xFB8B ; mov di,bx
 rep movsw
 @traps_loop_end:
 

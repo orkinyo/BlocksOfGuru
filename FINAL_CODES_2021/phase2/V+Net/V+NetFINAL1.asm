@@ -42,7 +42,7 @@ xlatb
 @our_start:
 xchg bx,[SHARE_LOC]
 dw 0xF08B ; mov si,ax
-mov ax,bx ;; 
+dw 0xC38B ; mov ax,bx ;; 
 div word [bx + LB_DIV_OFFSET]
 add dx,0xFF6
 
@@ -75,7 +75,7 @@ mov [si + @write_ah + 0x3],bh
 mov [si + @write_al + 0x4],bl
 
 @zomb_prep:
-xor di,di ;; 
+dw 0xFF33 ; xor di,di ;; 
 lea bx,[si + @array]
 ; dw 0xF633 ; xor si,si
 mov [SHARE_LOC_1],bp
@@ -140,12 +140,12 @@ rep movsw
 
 ;;
 
-mov bx,bp
+dw 0xDD8B ; mov bx,bp
 
 push ss
-
-mov cl,(@loop_end - @loop)/0x2
 pop ds
+mov cl,(@loop_end - @loop)/0x2
+
 push cs
 
 dw 0xF633 ; xor si,si
