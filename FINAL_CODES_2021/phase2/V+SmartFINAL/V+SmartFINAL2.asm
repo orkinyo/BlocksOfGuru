@@ -154,7 +154,7 @@ mov dx,CF_JUMP_DIST
 mov cl,(@cf_loop_end - @cf_loop)/0x2
 dw 0xF633 ; xor si,si
 les di,[bx+si]
-mov bp,ZOMBIE_COUNTER
+mov bp,0x8000+ZOMBIE_COUNTER
 dec di
 
 lea sp,[di+bx]
@@ -372,7 +372,7 @@ movsw
 movsw
 sub di,[bx+si]
 dec bp
-db 0x75
+db 0x78
 call far [bx]
 @cf_loop_end:
 dw (CF_JUMP_DIST - (@cf_loop_end - @cf_loader) - 0x2)
