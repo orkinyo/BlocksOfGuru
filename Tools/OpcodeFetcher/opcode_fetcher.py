@@ -49,7 +49,7 @@ def main():
 
         all_opcodes = get_all_opcodes(inst)
 
-        w = "".join([hex(i)[2:].upper() for i in default_opcode])
+        w = "".join([f"{i:02x}".upper() for i in default_opcode])
         # print(w)
 
         for line in all_opcodes:
@@ -59,16 +59,21 @@ def main():
                 default_line = line
                 break
 
-        print("The alternative opcodes are:")
+        has_alt = False
         for line in all_opcodes:
             if line != default_line:
+                
+                if not has_alt:
+                    print("The alternative opcodes are:")
+                    has_alt = True
                 opcode = line.split()[0]
                 if len(opcode) == 4:
                     opcode = "dw 0x" + opcode[2:4] + opcode[:2]
                 else:
                     opcode = "db 0x" + opcode
                 print(line.strip() + "\t\t" + opcode)
-        print("\n")
+        if has_alt:
+            print("\n")
         instruction = None
 
 
