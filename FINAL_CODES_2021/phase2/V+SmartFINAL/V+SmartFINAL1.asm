@@ -7,13 +7,13 @@
 %define ZOMB_WRITE_DIST 0x6C
 ;;
 ;; GENERAL DEFINES
-%define LB_ZOMBIE_LOOP 0x10A
-%define LB_ZOMBIE_START 0x28
-%define LB_WRITE_AX 0x41
-%define LB_ADD_XCHG 0x11C
-%define LB_RESET_XCHG 0x123
-%define LB_DIV_OFFSET 0x22
-%define LB_AX_LES_OFFSET 0x24
+%define LB_ZOMBIE_LOOP 0x106
+%define LB_ZOMBIE_START 0x2C
+%define LB_WRITE_AX 0x45
+%define LB_ADD_XCHG 0x118
+%define LB_RESET_XCHG 0x11F
+%define LB_DIV_OFFSET 0x26
+%define LB_AX_LES_OFFSET 0x28
 
 %define SHARE_LOC 0xE129
 %define SHARE_LOC_1 0x8701
@@ -56,7 +56,7 @@ add bx,LB_ZOMBIE_START
 int 0x86
 
 lea di,[bx + LB_ZOMBIE_LOOP - LB_ZOMBIE_START]
-mov [bx - LB_ZOMBIE_START + LB_WRITE_AX+ 0x1],si 
+add [bx - LB_ZOMBIE_START + LB_WRITE_AX+ 0x1],si 
 mov [di + LB_ADD_XCHG - LB_ZOMBIE_LOOP + 0x2],di
 mov [di + LB_RESET_XCHG - LB_ZOMBIE_LOOP + 0x2],di
 

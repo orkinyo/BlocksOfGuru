@@ -69,6 +69,9 @@ xlatb
 xlatb
 xchg ah,al
 xlatb
+xlatb
+xchg ah,al
+xlatb
 
 @div_offset:
 db 0xF
@@ -92,20 +95,13 @@ int 0x87
 cld
 
 @write_ax:
-mov ax,0xCCCC
+mov ax,ZOMB_SEG_DIFF
 
 push ax
 
 dw 0xD233 ; xor dx,dx
 div cx
-add dx,(0xFF6+ZOMB_SEG_DIFF)
-
-cmp dx,0x1005
-jb @skip_seg
-
-dw 0xD12B ; sub dx,cx
-
-@skip_seg:
+add dx,0xFF6
 
 call @get_ip
 @get_ip:
@@ -134,7 +130,7 @@ lea bx,[bp + CALL_DIST + 0x1]
 pop ax
 add byte [si - @cf_copy_end + @add_jd + 0x2],(ROWS_GAP + 0x3)
 @add_jd:
-add ah,(CF_JUMP_DIST/0x100)
+add ax,CF_JUMP_DIST-ZOMB_SEG_DIFF
 push ss
 mov al,0xA2
 pop ds
@@ -379,6 +375,9 @@ dw (CF_JUMP_DIST - (@cf_loop_end - @cf_loader) - 0x2)
 @cf_copy_end:
 
 @bottom_decoy:
+xlatb
+xchg ah,al
+xlatb
 xlatb
 xchg ah,al
 xlatb
