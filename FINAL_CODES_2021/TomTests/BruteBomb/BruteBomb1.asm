@@ -1,0 +1,27 @@
+
+
+push cs
+pop es
+
+mov di,0x8501
+
+mov cl,0x30
+
+@wait:
+loop @wait
+
+mov cl,0x8
+
+mov [0x8301],cs
+mov [0x8101],cs
+int 0x86
+mov di,0x8101
+int 0x86
+mov [0x8501],cs
+mov [0x8701],cs
+
+xchg ax,[0x4100]
+xchg dx,[0x4200]
+xchg sp,[0x4300]
+xchg si,[0x4400]
+
