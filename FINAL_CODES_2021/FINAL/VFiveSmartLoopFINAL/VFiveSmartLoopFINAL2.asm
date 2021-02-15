@@ -9,7 +9,7 @@
 %define ZOMB_WRITE_DIST 0x6C
 %define ROWS_GAP 0x3
 %define ZOMB_JUMP_OPCODE (((@zomb_land - @zomb_jump - 0x2) * 0x100) + 0xEB)
-%define ZOMB_COUNTER 0x200
+%define ZOMB_COUNTER 0x80
 
 %define AX_INT_86 0x86D7
 %define INT_87_AX 0xCCCC
