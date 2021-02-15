@@ -48,6 +48,7 @@ mov [SHARE_LOC],ax
 jmp @our_start
 
 @top_decoy:
+nop
 xlatb
 xchg ah,al
 xlatb
@@ -88,25 +89,19 @@ mov di,[CALL_DI_LOOP_WORD]
 int 0x86
 
 mov ax,ZOMB_INT_87_AX
-mov cx,0xF
+xchg cx,si
 std
 mov dx,ZOMB_INT_87_DX
 int 0x87
 cld
 
-@write_ax:
-mov ax,ZOMB_SEG_DIFF
-
-push ax
+lea ax,[si - @zombie_start + ZOMB_SEG_DIFF]
 
 dw 0xD233 ; xor dx,dx
-div cx
+div word [si - @zombie_start + @div_offset]
 add dx,0xFF6
 
-call @get_ip
-@get_ip:
-pop si
-add si,(@cf_copy - @get_ip -0x1)
+add si,(@cf_copy - 0x1 - @zombie_start)
 
 @zomb_wait:
 xchg ch,[si]
@@ -127,10 +122,10 @@ rep movsw
 movsw
 
 lea bx,[bp + CALL_DIST + 0x1]
-pop ax
-add byte [si - @cf_copy_end + @add_jd + 0x2],(ROWS_GAP + 0x3)
+
+add byte [si - @cf_copy_end + @add_jd + 0x3],(ROWS_GAP + 0x3)
 @add_jd:
-add ax,CF_JUMP_DIST-ZOMB_SEG_DIFF
+lea ax,[si + CF_JUMP_DIST - @copy_end]
 push ss
 mov al,0xA2
 pop ds
@@ -172,7 +167,7 @@ add ax,@copy_end - SI_PART1
 mov bx,ss
 and bx,0x10
 mov si,ss
-lea si,[bx+si+0xD]
+lea si,[bx+si+0x4]
 xchg ax,si
 
 push si ; for end
@@ -297,13 +292,13 @@ rep movsw
 
 @traps_loop:
 lea sp,[bx + INIT_SI - 0x3]
-mov cx,0x515
+mov cx,0x504
 dw 0xDF8B ; mov bx,di
 
 @anti_loop:
 pop di
 pop bp
-rcl bp,cl
+shl bp,cl
 mov word [bp+di-0x2],ax
 add sp,(-0x3)
 dec ch
@@ -313,7 +308,8 @@ rep movsw
 @traps_loop_end:
 
 @reset_main_loop_loader:
-
+mov cl,(@main_loop_end - @reset_main_loop)/0x2 - 0x2
+rep movsw
 
 @reset_main_loop:
 add di,BOTTOM_TRAP_DIST
@@ -329,9 +325,9 @@ add dh,(JUMP_DIST/0x100)
 @main_loop:
 pop di
 pop bp
-rcr bp,cl
-mov word [bp+di-0x2],ax
 add sp,[bx]
+shl bp,cl
+mov word [bp+di-0x2],ax
 mov bp,[bx]
 cmp [bx+si],bp
 jz @main_loop
