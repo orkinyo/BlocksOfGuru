@@ -9,15 +9,17 @@ nasm_output_file = "LabelResolveFile"
 
 
 def backup():
-    with open(SURVIVORS[0],"r") as f:
-        d1 = f.read()
-    with open(SURVIVORS[1],"r") as f:
-        d2 = f.read()
+
+    dir = os.path.dirname(os.path.realpath(__file__))
+    for i in (1,2):
+        with open(SURVIVORS[i-1],"r") as f:
+            d = f.read()
+            
+        basename = os.path.basename(SURVIVORS[0])
+        backup = os.path.join(dir,"Backup",basename)
+        with open(backup,"w+") as f:
+            f.write(d)
     
-    with open(f"{os.path.dirname(os.path.realpath(__file__))}\\Backup\\{os.path.basename(SURVIVORS[0])}","w+") as f:
-        f.write(d1)
-    with open(f"{os.path.dirname(os.path.realpath(__file__))}\\Backup\\{os.path.basename(SURVIVORS[1])}","w+") as f:
-        f.write(d2)
     
     
 def replace_label(label_name : str, surv_index : int, value: str, line_index: int):
@@ -53,8 +55,8 @@ def resolve_label(label_name : str,surv_index:int ):
         resolve_data = f.read()
     #os.system(f"del {nasm_input_file}")
     #os.system(f"del {nasm_output_file}")
-    os.remove(f"{os.getcwd()}\\{nasm_output_file}")
-    os.remove(f"{os.getcwd()}\\{nasm_input_file}")
+    os.remove(os.path.join(os.getcwd(),nasm_output_file))
+    os.remove(os.path.join(os.getcwd(),nasm_input_file))
     value = resolve_data[-3:]
 
     #DEBUG
@@ -112,39 +114,19 @@ def create_survivor_names(surv_name : str):
     """:parameter = name of one of the survivors to be checked
         :returns -> sets the global list SURVIVORS to the correct survivors names"""
     global SURVIVORS
-    surv_name_no_file_ext: str = surv_name[:-4] # with out ".asm"
+    surv_name_no_file_ext: str = surv_name[:-4] # without ".asm"
     if not os.path.exists(surv_name):
         print(f"CANT FIND FILE {surv_name}")
         sys.exit(1)
-    if surv_name_no_file_ext.endswith("1"):
+    if surv_name_no_file_ext.endswith("1") or surv_name_no_file_ext.endswith("2"):
+        
+        for i in (1,2):
+            
+            if not os.path.exists(surv_name_no_file_ext[:-1]+f"{i}.asm"):
+                print(f"CANT FIND FILE {surv_name_no_file_ext[:-1]}{i}.asm")
+                sys.exit()
 
-        #DEBUG
-        #print("file name ends with 1")
-        #DEBUG
-
-        if not os.path.exists(surv_name_no_file_ext[:-1]+"2.asm"):
-            print(f"CANT FIND FILE {surv_name_no_file_ext[:-1]+'2.asm'}")
-            sys.exit()
-
-        SURVIVORS[0] = surv_name
-        SURVIVORS[1] = surv_name_no_file_ext[:-1] + "2" + ".asm"
-
-        return
-
-    if surv_name_no_file_ext.endswith("2"):
-
-        # DEBUG
-        #print("file name ends with 2")
-        # DEBUG
-
-        if not os.path.exists(surv_name_no_file_ext[:-1] + "1.asm"):
-            print(f"CANT FIND FILE {surv_name_no_file_ext[:-1] + '1.asm'}")
-            sys.exit()
-
-        SURVIVORS[0] = surv_name
-        SURVIVORS[1] = surv_name_no_file_ext[:-1] + "1" + ".asm"
-
-        return
+            SURVIVORS[i-1] = surv_name_no_file_ext[:-1]+f"{i}.asm"
 
     else:
         print("Enter a surv name that ends with 1")
@@ -159,7 +141,7 @@ def write_output():
 
 
 def main():
-    print("drag surv file, either surv1 or surv2 is good, make sure they are at the same directory")
+    # print("drag surv file, either surv1 or surv2 is good, make sure they are at the same directory")
     surv_name = input()
     create_survivor_names(surv_name)
     backup()
@@ -167,6 +149,7 @@ def main():
     fix_lables(0)
     fix_lables(1)
     write_output()
+    print("Label Resolver succeeded!")
 
 
 

@@ -21,6 +21,9 @@
 %define SHARE_LOC 0x8AC6
 %define SHARE_LOC_1 0x8701
 
+%define ZOMBIE_JUMP_DIST 0xC600
+%define ZOMB_SEG_DIF 0x5
+
 mov [SHARE_LOC],ax
 jmp @our_start
 
@@ -33,11 +36,6 @@ dw AX_INT_86
 dw 0x1000
 
 @top_decoy:
-cwd
-sub di,[bx+si]
-call far [bx]
-sub di,[bx+si]
-call far [bx]
 sub di,[bx+si]
 call far [bx]
 sub di,[bx+si]
@@ -205,26 +203,27 @@ mov sp,0x7FE
 jnp @bomb_again
 
 dw 0xF633 ; xor si,si
+mov dh,(JUMP_DIST/0x100)
 
 jmp @skip_zomb_counter
 ;;;;;;;;;;;;
 
 @zomb_land:
 mov si,0x8000 + ZOMB_COUNTER
+mov dh,(ZOMBIE_JUMP_DIST/0x100)
 
 @skip_zomb_counter:
-pop bx
 
+pop bx
+dw 0xD232 ; xor dl,dl
 push ss
 
-mov dx,JUMP_DIST
-pop ds
-
 dw 0xC38B ; mov ax,bx
+pop ds
+les di,[bx]
 
 push cs
-
-les di,[bx]
+add [@copy_end-@copy-0x2],dx
 pop ss
 
 dec di
@@ -266,7 +265,7 @@ db 0x78
 db 0xFF
 db 0x1F
 @loop_end:
-dw (JUMP_DIST - (@loop_end - @loader) - 0x2)
+dw (- (@loop_end - @loader) - 0x2)
 @copy_end:
 @db_1:
 db 0x1
@@ -274,29 +273,35 @@ db 0x1
 db 0xFF
 
 @zomb_start:
-call @get_ip
-@get_ip:
-
-pop si
-lea ax,[si - @get_ip]
+mov si,cx
+lea ax,[si - @zomb_start]
 dw 0xD233 ; xor dx,dx
 
 @wait:
-xchg dl,[si - @get_ip + @db_1]
+xchg dl,[si - @zomb_start + @db_1]
 cmp dl,0x1
 jnz @wait
 
-xchg dl,[si - @get_ip + @db_1]
+xchg dl,[si - @zomb_start + @db_1]
 
-inc byte [si - @get_ip + @who_am_i]
-jz @nt
-cmp byte [si - @get_ip + @who_am_i],0x2
+inc byte [si - @zomb_start + @who_am_i]
+jz @nt_first
+cmp byte [si - @zomb_start + @who_am_i],0x2
 jz @nt
 
-mov word [si-@get_ip+@zomb_jump],ZOMB_JUMP_OPCODE
-add si,(@copy - @get_ip)
+mov word [si-@zomb_start+@zomb_jump],ZOMB_JUMP_OPCODE
+add si,(@copy - @zomb_start)
 
 jmp @zomb_actual_start
+
+@nt_first:
+add si,@write_seg+0x1-@zomb_start
+add word [si],ZOMB_SEG_DIF
+cmp word [si],0x1005
+jb @no_overflow
+
+sub word [si],0xF
+@no_overflow:
 
 @nt:
 push cs
@@ -321,12 +326,7 @@ sub di,[bx+si]
 call far [bx]
 sub di,[bx+si]
 call far [bx]
-sub di,[bx+si]
-call far [bx]
-sub di,[bx+si]
-call far [bx]
-sub di,[bx+si]
-call far [bx]
+
 
 movsb
 movsw
