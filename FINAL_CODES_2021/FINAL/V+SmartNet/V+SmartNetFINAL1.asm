@@ -8,12 +8,12 @@
 ;;
 ;; GENERAL DEFINES
 %define LB_ZOMBIE_LOOP 0x102
-%define LB_ZOMBIE_START 0x2C
+%define LB_ZOMBIE_START 0x2D
 ; %define LB_WRITE_AX 0x45
 %define LB_ADD_XCHG 0x114
 %define LB_RESET_XCHG 0x11B
-%define LB_DIV_OFFSET 0x26
-%define LB_AX_LES_OFFSET 0x28
+%define LB_DIV_OFFSET 0x27
+%define LB_AX_LES_OFFSET 0x29
 
 %define SHARE_LOC 0xE129
 %define SHARE_LOC_1 0x8701
@@ -39,7 +39,7 @@ xlatb
 @our_start:
 xchg bx,[SHARE_LOC]
 dw 0xF08B ; mov si,ax
-dw 0xC38B ; mov ax,bx
+mov ax,bx
 div word [bx + LB_DIV_OFFSET]
 add dx,0xFF6
 
