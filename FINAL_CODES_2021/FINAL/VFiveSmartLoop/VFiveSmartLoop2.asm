@@ -27,24 +27,105 @@ db 0x0
 dw AX_INT_86
 dw 0x1000
 
+@top_decoy:
+nop
+xlatb
+xchg ah,al
+xlatb
+nop
+xlatb
+xchg ah,al
+xlatb
+nop
+xlatb
+xchg ah,al
+xlatb
+nop
+xlatb
+xchg ah,al
+xlatb
+nop
+xlatb
+xchg ah,al
+xlatb
+nop
+xlatb
+xchg ah,al
+xlatb
+nop
+xlatb
+xchg ah,al
+xlatb
+nop
+xlatb
+xchg ah,al
+xlatb
+nop
+xlatb
+xchg ah,al
+xlatb
+nop
+xlatb
+xchg ah,al
+xlatb
+nop
+xlatb
+xchg ah,al
+xlatb
+nop
+xlatb
+xchg ah,al
+xlatb
+nop
+xlatb
+xchg ah,al
+xlatb
+nop
+xlatb
+xchg ah,al
+xlatb
+mov [0xC801],al
+mov [0xC501],al
+mov [0xC701],al
+mov [0xC401],al
+mov [0xC101],al
+mov [0xC201],al
+mov [0xC301],al
+mov [0x4501],al
+mov [0x4701],al
+mov [0x4401],al
+mov [0x4101],al
+mov [0x4201],al
+mov [0x4301],al
+
+db 0x10
+movsw
+movsw
+movsw
+db 0x83
+db 0x10
+movsw
+movsw
+movsw
+db 0x83
 
 @our_start:
-mov si,ax
+dw 0xF08B ; mov si,ax
 push ss
 add si,@copy
 pop es
 
-push cs
 mov cx,(@copy_end - @copy)/0x2 - 0x1
+push cs
 
 @write_seg:
 mov dx,0xCCCC
-mov bp,dx
-rcr bp,cl
-add bp,0x100
+dw 0xEA8B ; mov bp,dx
 push cs
+rcr bp,cl
 
 rep movsw
+add bp,0x100
 movsw
 
 pop es
@@ -54,13 +135,12 @@ mov ax,ROWS_GAP*0x100
 add byte [si-@copy_end+@write_ax+0x2],ROWS_GAP
 mov al,0xA7
 
-xchg [bp],ax
-mov word [bp+0x2],dx
-
 add word [bp + di - 0x2],JUMP_DIST - GAP - CALL_DIST
+mov word [bp+0x2],dx
+push ss
 mov word [bp + (@loop - @copy)],GAP
 
-push ss
+xchg [bp],ax
 
 ;
 @zomb_jump:
@@ -71,9 +151,9 @@ add si,@start-@copy_end
 mov [si-@start+@add_xchg+0x2],si
 mov [si-@start+@reset_xchg+0x2],si
 dec di
-mov bp,di
-mov cl,0x4
+dw 0xEF8B ; mov bp,di
 cwd
+mov cl,0x4
 cwd
 xchg bx,[SHARE_LOC]
 @bomb_sec:
@@ -98,8 +178,8 @@ nop
 xlatb
 xchg ah,al
 xlatb
-xor ah,al
-mov di,ax
+dw 0xE032 ; xor ah,al
+xchg di,ax
 @write_ah:
 mov word [di + ZOMB_WRITE_DIST + 0x2],0xFFCC
 @write_al:
@@ -109,15 +189,14 @@ add byte [0xCCCC],0x2
 loop @start
 @reset_xchg:
 mov byte [0xCCCC],0x90
-mov cl,0x4
 
 inc bp
-mov di,bp
-
+mov cl,0x4
+dw 0xFD8B ; mov di,bp
 
 jnp @bomb_sec
 
-xor si,si
+dw 0xF633 ; xor si,si
 mov sp,0x7FA
 
 jmp @skip_zomb_counter
@@ -128,23 +207,24 @@ mov si,(0x8000 + ZOMB_COUNTER)
 @skip_zomb_counter:
 mov di,[0x0000]
 int 0x86
-xor di,di
+mov cl,(@loop_end - @loop)/0x2
+pop ds
+dw 0xFF33 ; xor di,di
+pop bx
 int 0x86
 
-pop ds
-pop bx
+mov dx,INT_87_DX
+
 pop ss
 
-mov cl,(@loop_end - @loop)/0x2
-mov bp,si
-xor si,si
-
 mov ax,INT_87_AX
-mov dx,INT_87_DX
+dw 0xEE8B ; mov bp,si
+
 int 0x87
 
+dw 0xF633 ; xor si,si
+les di,[bx+si]
 mov ax,0xA5F3
-les di,[bx]
 lea sp,[di + bx + 0x2 - CALL_DIST - 0x100]
 dec di
 mov dx,JUMP_DIST
@@ -152,7 +232,7 @@ mov dx,JUMP_DIST
 movsw
 movsw
 movsw
-sub di,0x2
+add di,(-0x2)
 
 call far [bx]
 
@@ -165,15 +245,15 @@ call far [bx]
 db 0x65
 
 @loop:
-add [bx],dx
+mov cl,(@loop_end - @loop)/0x2
 add di,[si]
 add sp,[bx+si]
-mov cl,(@loop_end - @loop)/0x2
-xor si,si
+dw 0xF633 ; xor si,si
+add [bx+si],dx
 movsw
 movsw
 movsw
-sub di,0x2
+add di,(-0x2)
 dec bp
 db 0x78
 call far [bx]
@@ -186,21 +266,101 @@ dw (JUMP_DIST - (@loop_end - @loop) - 0x2 - 0x4)
 @db_1:
 db 0x1
 @zomb_start:
+dw 0xF18B ; mov si,cx
 
-call @get_ip
-@get_ip:
-pop si
-
-xor dx,dx
+dw 0xD233 ; xor dx,dx
 @wait:
-xchg dl,[si-@get_ip+@db_1]
+xchg dl,[si-@zomb_start+@db_1]
 cmp dl,0x1
 jnz @wait
 
-xchg [si-@get_ip+@db_1],dl
+xchg [si-@zomb_start+@db_1],dl
 
-lea ax,[si-@get_ip]
-mov word[si-@get_ip+@zomb_jump],ZOMB_JUMP_OPCODE
+lea ax,[si-@zomb_start]
+mov word[si-@zomb_start+@zomb_jump],ZOMB_JUMP_OPCODE
 
 
 jmp @our_start
+
+@bottom_decoy:
+cwd
+cwd
+cwd
+cbw
+cwd
+cwd
+cwd
+nop
+xlatb
+xchg ah,al
+xlatb
+nop
+xlatb
+xchg ah,al
+xlatb
+nop
+xlatb
+xchg ah,al
+xlatb
+nop
+xlatb
+xchg ah,al
+xlatb
+nop
+xlatb
+xchg ah,al
+xlatb
+nop
+xlatb
+xchg ah,al
+xlatb
+nop
+xlatb
+xchg ah,al
+xlatb
+nop
+xlatb
+xchg ah,al
+xlatb
+nop
+xlatb
+xchg ah,al
+xlatb
+nop
+xlatb
+xchg ah,al
+xlatb
+nop
+xlatb
+xchg ah,al
+xlatb
+nop
+xlatb
+xchg ah,al
+xlatb
+nop
+xlatb
+xchg ah,al
+xlatb
+nop
+xlatb
+xchg ah,al
+xlatb
+mov [0xC801],al
+mov [0xC501],al
+mov [0xC701],al
+mov [0xC401],al
+mov [0xC101],al
+mov [0xC201],al
+mov [0xC301],al
+db 0x10
+movsw
+movsw
+movsw
+db 0x83
+db 0x10
+movsw
+movsw
+movsw
+db 0x83
+

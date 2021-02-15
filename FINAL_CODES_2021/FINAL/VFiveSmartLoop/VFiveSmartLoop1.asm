@@ -24,28 +24,28 @@ jmp @our_start
 
 @our_start:
 xchg bx,[SHARE_LOC]
-mov si,ax
+dw 0xF08B ; mov si,ax
 div word [bx + LB_DIV_OFFSET]
 add dx,0xFF6
 
 mov [bx+LB_WRITE_SEG+0x1],dx
 
 mov cl,(@copy_end-@copy)/0x2 - 0x1
-mov bp,dx
+dw 0xEA8B ; mov bp,dx
 rcr bp,cl
 add bp,0x100
+les ax,[bx + LB_AX_LES_OFFSET]
 mov [bp + 0x2],dx
 
-les ax,[bx + LB_AX_LES_OFFSET]
-mov dx, DX_INT_86
+mov dx,DX_INT_86
 lea di,[si-0x100]
 int 0x86
+add si,@copy
 add di,@end
+push ss
 int 0x86
 
-xor di,di
-add si,@copy
-push ss
+dw 0xFF33 ; xor di,di
 pop es
 
 lea ax,[si + JUMP_DIST - @copy_end]
@@ -55,11 +55,11 @@ add word [bp+(@copy_end - @copy) - 0x2],JUMP_DIST - GAP - CALL_DIST
 mov word [bp + (@loop - @copy)],GAP
 
 rep movsw
+push bp
 movsw
 
 mov al,0xA7
 
-push bp
 xchg [bp],ax
 
 ;
@@ -67,7 +67,7 @@ add bx,LB_ZOMB_START
 mov [si-@copy_end+@write_ah+0x3],bh
 mov [si-@copy_end+@write_al+0x4],bl
 dec di
-mov bp,di
+dw 0xEF8B ; mov bp,di
 lea bx,[si-@copy_end+@array]
 mov [SHARE_LOC],bx
 mov cl,0x4
@@ -92,7 +92,7 @@ nop
 xlatb
 xchg ah,al
 xlatb
-xor ah,al
+dw 0xE032 ; xor ah,al
 xchg di,ax
 @write_ah:
 mov word [di + ZOMB_WRITE_DIST + 0x2],0xFFCC
@@ -102,10 +102,10 @@ add byte [bx - @array + @start],0x2
 loop @start
 
 mov byte [bx - @array + @start],0x90
-mov cl,0x4
 
 inc bp
-mov di,bp
+mov cl,0x4
+dw 0xFD8B ; mov di,bp
 mov sp,0x7FE
 
 jnp @bomb_sec
@@ -113,30 +113,29 @@ jnp @bomb_sec
 
 pop bx
 push cs
+dw 0xF633 ; xor si,si
 pop es
 push ss
+mov cl,(@loop_end - @loop)/0x2
 pop ds
+mov dx,INT_87_DX
 push cs
+mov ax,INT_87_AX
 pop ss
 
-xor si,si
-mov cl,(@loop_end - @loop)/0x2
-xor bp,bp
-
-mov ax,INT_87_AX
-mov dx,INT_87_DX
 int 0x87
 
-les di,[bx]
+les di,[bx+si]
+mov ax,0xA5F3
 lea sp,[di + bx + 0x2 - 0x100 - CALL_DIST]
 dec di
-mov ax,0xA5F3
 mov dx,JUMP_DIST
 
 movsw
 movsw
+dw 0xED33 ; xor bp,bp
 movsw
-sub di,0x2
+add di,(-0x2)
 
 call far [bx]
 
@@ -148,15 +147,15 @@ call far [bx]
 db 0x65
 
 @loop:
-add [bx],dx
+mov cl,(@loop_end - @loop)/0x2
 add di,[si]
 add sp,[bx+si]
-mov cl,(@loop_end - @loop)/0x2
-xor si,si
+dw 0xF633 ; xor si,si
+add [bx+si],dx
 movsw
 movsw
 movsw
-sub di,0x2
+add di,(-0x2)
 dec bp
 db 0x78
 call far [bx]
