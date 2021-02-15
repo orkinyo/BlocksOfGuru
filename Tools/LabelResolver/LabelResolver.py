@@ -14,9 +14,9 @@ def backup():
     with open(SURVIVORS[1],"r") as f:
         d2 = f.read()
     
-    with open(f"{os.getcwd()}\\{os.path.basename(SURVIVORS[0])}","w+") as f:
+    with open(f"{os.path.dirname(os.path.realpath(__file__))}\\Backup\\{os.path.basename(SURVIVORS[0])}","w+") as f:
         f.write(d1)
-    with open(f"{os.getcwd()}\\{os.path.basename(SURVIVORS[1])}","w+") as f:
+    with open(f"{os.path.dirname(os.path.realpath(__file__))}\\Backup\\{os.path.basename(SURVIVORS[1])}","w+") as f:
         f.write(d2)
     
     
