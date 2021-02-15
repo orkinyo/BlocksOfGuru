@@ -8,11 +8,12 @@
 
 %define ZOMB_WRITE_DIST 0x6C
 %define DX_INT_86 0xD7C4
-%define LB_ZOMB_START 0xF6
-%define LB_WRITE_AX 0x28
-%define LB_WRITE_SEG 0x17
+%define LB_ZOMB_START 0x17A
+%define LB_WRITE_AX 0xA1
+%define LB_WRITE_SEG 0x90
 %define LB_DIV_OFFSET 0x5
 %define LB_AX_LES_OFFSET 0x7
+%define LB_ADD_BP 0xB
 
 %define INT_87_AX 0xCCCC
 %define INT_87_DX 0xFFCC
@@ -21,6 +22,10 @@
 
 jmp @our_start
 
+@top_decoy:
+xlatb
+xchg ah,al
+xlatb
 
 @our_start:
 xchg bx,[SHARE_LOC]
@@ -33,7 +38,7 @@ mov [bx+LB_WRITE_SEG+0x1],dx
 mov cl,(@copy_end-@copy)/0x2 - 0x1
 dw 0xEA8B ; mov bp,dx
 rcr bp,cl
-add bp,0x100
+add bp,[bx+LB_ADD_BP]
 les ax,[bx + LB_AX_LES_OFFSET]
 mov [bp + 0x2],dx
 
@@ -162,6 +167,11 @@ call far [bx]
 @loop_end:
 dw (JUMP_DIST - (@loop_end - @loop) - 0x2 - 0x4)
 @copy_end:
+
+@bottom_decoy:
+xlatb
+xchg ah,al
+xlatb
 
 @array:
 db 0x00

@@ -16,7 +16,6 @@
 %define INT_87_DX 0xFFCC
 
 
-
 mov [SHARE_LOC],ax
 jmp @our_start
 
@@ -26,6 +25,9 @@ db 0x0
 @ax_les_offset:
 dw AX_INT_86
 dw 0x1000
+
+@add_bp:
+dw 0x100
 
 @top_decoy:
 nop
@@ -285,9 +287,7 @@ jmp @our_start
 @bottom_decoy:
 cwd
 cwd
-cwd
 cbw
-cwd
 cwd
 cwd
 nop
