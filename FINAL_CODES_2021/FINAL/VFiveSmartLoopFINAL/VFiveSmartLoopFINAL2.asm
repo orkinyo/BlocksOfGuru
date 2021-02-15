@@ -124,6 +124,7 @@ push cs
 mov dx,0xCCCC
 dw 0xEA8B ; mov bp,dx
 push cs
+clc
 rcr bp,cl
 
 rep movsw
@@ -154,7 +155,6 @@ mov [si-@start+@add_xchg+0x2],si
 mov [si-@start+@reset_xchg+0x2],si
 dec di
 dw 0xEF8B ; mov bp,di
-cwd
 mov cl,0x4
 cwd
 xchg bx,[SHARE_LOC]

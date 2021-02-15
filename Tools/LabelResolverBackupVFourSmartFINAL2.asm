@@ -91,19 +91,18 @@ xlatb
 xlatb
 xchg ah,al
 xlatb
-nop
 xlatb
 xchg ah,al
 xlatb
-nop
 xlatb
 xchg ah,al
 xlatb
-nop
 xlatb
 xchg ah,al
 xlatb
-nop
+xlatb
+xchg ah,al
+xlatb
 xlatb
 xchg ah,al
 xlatb
@@ -127,7 +126,7 @@ pop es
 
 @write_seg:
 mov dx,0xCCCC
-dw 0xEA03 ; add bp,dx
+dw 0xEA8B ; mov bp,dx
 rcr bp,cl
 add bp,CALL_DIST + 0x1
 mov [bp + 0x2],dx
@@ -303,7 +302,7 @@ push cs
 pop ss
 dw 0xE08B ; mov sp,ax
 
-mov cl,0x4
+mov cl,0xD
 
 mov dx,0xA593
 mov ax,0xF1 - 0x4
@@ -311,9 +310,9 @@ mov ax,0xF1 - 0x4
 @anti_loop:
 pop si
 pop bp
-dw 0xE003 ; add sp,ax
-shl bp,cl
+rcr bp,cl
 mov [bp + si - 0x2],dx
+dw 0xE003 ; add sp,ax
 jmp @anti_loop
 
 @bottom_decoy:
@@ -374,19 +373,18 @@ xlatb
 xlatb
 xchg ah,al
 xlatb
-nop
 xlatb
 xchg ah,al
 xlatb
-nop
 xlatb
 xchg ah,al
 xlatb
-nop
 xlatb
 xchg ah,al
 xlatb
-nop
+xlatb
+xchg ah,al
+xlatb
 xlatb
 xchg ah,al
 xlatb

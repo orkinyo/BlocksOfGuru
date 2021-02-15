@@ -7,15 +7,15 @@
 %define ZOMB_WRITE_DIST 0x6C
 ;;
 ;; GENERAL DEFINES
-; %define LB_ZOMBIE_LOOP 0x102
-%define LB_ZOMBIE_START 0x2D
+%define LB_ZOMBIE_LOOP 0x102
+%define LB_ZOMBIE_START 0x2C
 ; %define LB_WRITE_AX 0x45
-; %define LB_ADD_XCHG 0x114
-; %define LB_RESET_XCHG 0x11B
-%define LB_DIV_OFFSET 0x27
-%define LB_AX_LES_OFFSET 0x29
+%define LB_ADD_XCHG 0x114
+%define LB_RESET_XCHG 0x11B
+%define LB_DIV_OFFSET 0x26
+%define LB_AX_LES_OFFSET 0x28
 
-%define SHARE_LOC 0x59BF
+%define SHARE_LOC 0xE129
 %define SHARE_LOC_1 0x8701
 %define SHARE_LOC_2 0x8801
 %define INT_86_DX 0xD7E0
@@ -57,20 +57,20 @@ add di,@end
 add bx,LB_ZOMBIE_START
 int 0x86
 
-push cs
+lea di,[bx + LB_ZOMBIE_LOOP - LB_ZOMBIE_START]
+mov [di + LB_ADD_XCHG - LB_ZOMBIE_LOOP + 0x2],di
+mov [di + LB_RESET_XCHG - LB_ZOMBIE_LOOP + 0x2],di
+
 dw 0xFF33 ; xor di,di
-push cs
-push ss
-
-lea ax,[si + JUMP_DIST - @copy_end]
-
 push ss
 add si,@copy
-mov al,0xA2
+
 pop es
 
 rep movsw
 
+lea ax,[si + JUMP_DIST - @copy_end]
+mov al,0xA2
 mov [si - @copy_end + @write_al + 0x4],bl
 xchg [bp],ax
 mov [si - @copy_end + @write_ah + 0x3],bh
@@ -81,8 +81,8 @@ mov cl,0x4
 lea bx,[si-@copy_end+@array]
 dw 0xF633 ; xor si,si
 mov [SHARE_LOC_1],bp
-mov [SHARE_LOC_2],bx
 dw 0xEF8B ; mov bp,di
+mov [SHARE_LOC_2],bx
 
 @bomb_again:
 mov [0x4501],al
@@ -114,26 +114,31 @@ loop @zomb_loop
 
 mov byte [bx - @array + @zomb_loop],0x90
 
+
 inc bp
 mov cl,0x4
 dw 0xFD8B ; mov di,bp
 
-mov sp,0x7F8
+mov sp,0x7FE
 
 jp @bomb_again
 
 
 pop bx
 
+push ss
+
 mov cl,(@loop_end - @loop)/0x2
 pop ds
+push cs
 
 dw 0xF633 ; xor si,si
+pop ss
 
 mov ax,INT_87_AX
-pop es
+push cs
 mov dx,INT_87_DX
-pop ss
+pop es
 int 0x87
 
 les di,[bx+si]
