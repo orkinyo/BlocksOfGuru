@@ -10,7 +10,7 @@
 %define DIST_CALC (0xA2 + 0x4*0x4 -((@main_loop_end - @copy) + BOTTOM_TRAP_DIST))
 %define SAFETY_GAP 0x10
 %define DX_OFFSET (0x2-0x11)
-%define CL_PART1 0x7
+%define CL_PART1 0x6
 %define CL_PART2 ((@copy_end - @copy)/0x2 - CL_PART1)
 %define SI_PART1 (CL_PART1*0x2)
 ;;
@@ -39,7 +39,7 @@
 %define AX_XLATB 0x86D7
 %define ARENA_SEG 0x1000
 
-%define SHARE_LOC 0xC177
+%define SHARE_LOC 0x59BF
 %define SHARE_LOC_1 0x8701
 %define SHARE_LOC_2 0x8801
 
@@ -91,19 +91,16 @@ mov di,[CALL_DI_SHL_WORD]
 int 0x86
 mov di,[CALL_DI_LOOP_WORD]
 int 0x86
-
+xchg cx,si
 mov ax,ZOMB_INT_87_AX
-mov cx,0xF
 std
 mov dx,ZOMB_INT_87_DX
 int 0x87
 cld
 
-call @get_ip
-@get_ip:
-pop si
-add si,(@cf_copy - @get_ip - 0x1)
-lea ax,[si - (@cf_copy - 0x1) + ZOMB_SEG_DIFF]
+mov cl,0xF
+lea ax,[si - @zombie_start + ZOMB_SEG_DIFF]
+add si,(@cf_copy - @zombie_start - 0x1)
 
 ; mov ax,ZOMB_SEG_DIFF
 
@@ -122,6 +119,7 @@ inc si
 dw 0xEA8B ; mov bp,dx
 mov cl,(@cf_copy_end - @cf_copy)/0x2-0x1
 push ss
+clc
 rcr bp,cl
 pop es
 dw 0xFF33 ; xor di,di
@@ -174,10 +172,8 @@ add ax,@copy_end - SI_PART1
 mov bx,ss
 and bx,0x10
 mov si,ss
-lea si,[bx+si+0xD]
+lea si,[bx+si+0x4]
 xchg ax,si
-
-push si ; for end
 
 mov di,INIT_SI + @copy_end - @copy - SI_PART1
 mov es,ax
@@ -197,9 +193,7 @@ lea bx,[si - @copy_end + @zombie_start]
 mov [si - @copy_end + @write_ah + 0x3],bh
 mov [si - @copy_end + @write_al + 0x4],bl
 ; dw 0xF633 ; xor si,si
-add dx,[SHARE_LOC_1]
 ; push dx ; for end
-xchg bx,[SHARE_LOC_2]
 
 
 ;;;;;;;;;
@@ -211,7 +205,11 @@ mov [di + BEAT3_LOC_4 - 0xBB + 0x100],bp
 add di,0x200
 loop @bomb_loop
 
+add dx,[SHARE_LOC_1]
+xchg bx,[SHARE_LOC_2]
 mov cl,0x4
+push es
+push si ; for end
 
 @zomb_loop:
 xchg ax,[di + BEAT3_LOC_1 - 0x800 - 0xBB + 0x100]
@@ -254,10 +252,9 @@ dw 0xDA8B ; mov bx,dx
 mov cl,CL_PART2
 pop si ; for end
 
-push es
 mov di,INIT_SI
 push cs
-add si,SI_PART1 - @copy_end + @copy
+add si,(@copy - @copy_end)
 rep movsw
 
 pop es
@@ -305,13 +302,13 @@ rep movsw
 
 @traps_loop:
 lea sp,[bx + INIT_SI - 0x3]
-mov cx,0x515
+mov cx,0x504
 dw 0xDF8B ; mov bx,di
 
 @anti_loop:
 pop di
 pop bp
-rcl bp,cl
+shl bp,cl
 mov word [bp+di-0x2],ax
 add sp,(-0x3)
 dec ch
@@ -321,7 +318,8 @@ rep movsw
 @traps_loop_end:
 
 @reset_main_loop_loader:
-
+mov cl,(@main_loop_end - @reset_main_loop)/0x2 - 0x2
+rep movsw
 
 @reset_main_loop:
 add di,BOTTOM_TRAP_DIST
@@ -337,9 +335,9 @@ add dh,(JUMP_DIST/0x100)
 @main_loop:
 pop di
 pop bp
-rcr bp,cl
-mov word [bp+di-0x2],ax
 add sp,[bx]
+shl bp,cl
+mov word [bp+di-0x2],ax
 mov bp,[bx]
 cmp [bx+si],bp
 jz @main_loop
@@ -347,8 +345,6 @@ mov ds,cx
 dw 0xFA8B ; mov di,dx
 movsw
 jmp dx
-cwd
-cwd
 @main_loop_end:
 dw TRAP_VAL
 dw TRAP_VAL
