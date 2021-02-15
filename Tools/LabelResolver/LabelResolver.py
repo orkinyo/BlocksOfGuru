@@ -7,6 +7,19 @@ nasm_input_file = "LabelResolveFile.asm"
 nasm_output_file = "LabelResolveFile"
 
 
+
+def backup():
+    with open(SURVIVORS[0],"r") as f:
+        d1 = f.read()
+    with open(SURVIVORS[1],"r") as f:
+        d2 = f.read()
+    
+    with open(f"{os.getcwd()}\\{os.path.basename(SURVIVORS[0])}","w+") as f:
+        f.write(d1)
+    with open(f"{os.getcwd()}\\{os.path.basename(SURVIVORS[1])}","w+") as f:
+        f.write(d2)
+    
+    
 def replace_label(label_name : str, surv_index : int, value: str, line_index: int):
     line = SURVSLINES[surv_index][line_index]
     lines = line.split()
@@ -141,7 +154,7 @@ def create_survivor_names(surv_name : str):
 
 def write_output():
     for idx, file_name in enumerate(SURVIVORS):
-        with open(f"{file_name[:-5]}FIXED{file_name[-5]}.asm","w+") as f:
+        with open(f"{file_name[:-5]}{file_name[-5]}.asm","w+") as f:
             f.write("".join(SURVSLINES[idx]))
 
 
@@ -149,6 +162,7 @@ def main():
     print("drag surv file, either surv1 or surv2 is good, make sure they are at the same directory")
     surv_name = input()
     create_survivor_names(surv_name)
+    backup()
     read_files()
     fix_lables(0)
     fix_lables(1)
