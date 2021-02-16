@@ -5,11 +5,11 @@
 
 %define ZOMB_WRITE_DIST 0x6C
 
-%define LB_DIV_OFFSET 0x6
-%define LB_ZOMB_START 0x16D
-%define LB_AX_LES_OFFSET 0x8
-%define LB_WRITE_AX 0xB8
-%define LB_WRITE_SEG 0xA2
+%define LB_DIV_OFFSET 0x5
+%define LB_ZOMB_START 0x159
+%define LB_AX_LES_OFFSET 0x7
+%define LB_WRITE_AX 0xA3
+%define LB_WRITE_SEG 0x8D
 
 %define INT_86_DX 0xD7E0
 

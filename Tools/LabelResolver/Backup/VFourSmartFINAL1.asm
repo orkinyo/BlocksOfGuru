@@ -21,18 +21,6 @@
 %define SHARE_LOC 0x8AC6
 %define SHARE_LOC_1 0x8701
 
-%define ZOMBIE_JUMP_DIST 0xC600
-%define ZOMB_SEG_DIF 0x8
-
-;;
-;seg dif, score with zombs (wars 500)
-;
-;0,294
-;1,138
-;8,155
-;E,179
-;;
-
 mov [SHARE_LOC],ax
 jmp @our_start
 
@@ -45,6 +33,12 @@ dw AX_INT_86
 dw 0x1000
 
 @top_decoy:
+cwd
+cwd
+sub di,[bx+si]
+call far [bx]
+sub di,[bx+si]
+call far [bx]
 sub di,[bx+si]
 call far [bx]
 sub di,[bx+si]
@@ -114,6 +108,17 @@ nop
 xlatb
 xchg ah,al
 xlatb
+
+add di,[si]
+add [bx],dx
+add di,[si]
+add [bx],dx
+add di,[si]
+add [bx],dx
+add di,[si]
+add [bx],dx
+add di,[si]
+add [bx],dx
 
 @our_start:
 dw 0xF08B ; mov si,ax
@@ -128,7 +133,7 @@ mov [si-@copy+@reset_xchg+0x2],bx
 
 @zomb_actual_start:
 push ss
-mov cx,(@copy_end - @copy)/0x2 - 0x1
+mov cl,(@copy_end - @copy)/0x2 - 0x1
 
 pop es
 
@@ -212,27 +217,26 @@ mov sp,0x7FE
 jnp @bomb_again
 
 dw 0xF633 ; xor si,si
-mov dh,(JUMP_DIST/0x100)
 
 jmp @skip_zomb_counter
 ;;;;;;;;;;;;
 
 @zomb_land:
 mov si,0x8000 + ZOMB_COUNTER
-mov dh,(ZOMBIE_JUMP_DIST/0x100)
 
 @skip_zomb_counter:
-
 pop bx
-dw 0xD232 ; xor dl,dl
+
 push ss
 
-dw 0xC38B ; mov ax,bx
+mov dx,JUMP_DIST
 pop ds
-les di,[bx]
+
+dw 0xC38B ; mov ax,bx
 
 push cs
-add [@copy_end-@copy-0x2],dx
+
+les di,[bx]
 pop ss
 
 dec di
@@ -274,15 +278,14 @@ db 0x78
 db 0xFF
 db 0x1F
 @loop_end:
-dw (- (@loop_end - @loader) - 0x2)
+dw (JUMP_DIST - (@loop_end - @loader) - 0x2)
 @copy_end:
 @db_1:
 db 0x1
-@who_am_i:
-db 0xFF
 
 @zomb_start:
-mov si,cx
+xchg si,cx
+
 lea ax,[si - @zomb_start]
 dw 0xD233 ; xor dx,dx
 
@@ -293,49 +296,32 @@ jnz @wait
 
 xchg dl,[si - @zomb_start + @db_1]
 
-inc byte [si - @zomb_start + @who_am_i]
-jz @nt_first
-cmp byte [si - @zomb_start + @who_am_i],0x2
-jz @nt
-
-mov word [si-@zomb_start+@zomb_jump],ZOMB_JUMP_OPCODE
+mov word [si - @zomb_start + @zomb_jump],ZOMB_JUMP_OPCODE
 add si,(@copy - @zomb_start)
 
 jmp @zomb_actual_start
 
-@nt_first:
-add si,@write_seg+0x1-@zomb_start
-add word [si],ZOMB_SEG_DIF
-cmp word [si],0x1005
-jb @no_overflow
-
-sub word [si],0xF
-@no_overflow:
-
-@nt:
-push cs
-pop ss
-dw 0xE08B ; mov sp,ax
-
-mov cl,0x4
-
-mov dx,0xA593
-mov ax,0xF1 - 0x4
-
-@anti_loop:
-pop si
-pop bp
-dw 0xE003 ; add sp,ax
-shl bp,cl
-mov [bp + si - 0x2],dx
-jmp @anti_loop
-
 @bottom_decoy:
-sub di,[bx+si]
-call far [bx]
-sub di,[bx+si]
-call far [bx]
+add di,[si]
+add [bx],dx
+add di,[si]
+add [bx],dx
+add di,[si]
+add [bx],dx
+add di,[si]
+add [bx],dx
 
+
+sub di,[bx+si]
+call far [bx]
+sub di,[bx+si]
+call far [bx]
+sub di,[bx+si]
+call far [bx]
+sub di,[bx+si]
+call far [bx]
+sub di,[bx+si]
+call far [bx]
 
 movsb
 movsw
