@@ -6,10 +6,10 @@
 %define ZOMB_WRITE_DIST 0x6C
 
 %define LB_DIV_OFFSET 0x5
-%define LB_ZOMB_START 0x159
+%define LB_ZOMB_START 0x161
 %define LB_AX_LES_OFFSET 0x7
-%define LB_WRITE_AX 0xA3
-%define LB_WRITE_SEG 0x8D
+%define LB_WRITE_AX 0xB5
+%define LB_WRITE_SEG 0x8B
 
 %define INT_86_DX 0xD7E0
 
@@ -36,7 +36,7 @@ xchg bx,[SHARE_LOC]
 dw 0xF08B ; mov si,ax 
 div word [bx + LB_DIV_OFFSET]
 add dx,0xFF6
-mov [bx + LB_WRITE_SEG + 0x1],dx
+add [bx + LB_WRITE_SEG + 0x2],dx
 
 mov cl,(@copy_end - @copy)/0x2 - 0x1
 
