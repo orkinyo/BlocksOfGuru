@@ -2,9 +2,9 @@
 %define CALL_AMOUNT 0x55
 %define GAP 0x19
 %define CALL_DIST (CALL_AMOUNT * (GAP - 0x4) - 0x4)
-%define MAGIC_SEG 0xFFA
 
-%define SHARE_LOC 0x8101
+%define SHARE_LOC 0xB879
+%define SHARE_LOC_1 0x8701
 
 %define ZOMB_WRITE_DIST 0x6C
 %define ROWS_GAP 0x3
@@ -28,6 +28,9 @@ dw 0x1000
 
 @add_bp:
 dw 0x100
+
+@ff6:
+dw 0xFF6
 
 @top_decoy:
 nop
@@ -121,7 +124,8 @@ mov cx,(@copy_end - @copy)/0x2 - 0x1
 push cs
 
 @write_seg:
-mov dx,0xCCCC
+div word [si - @copy + @div_offset]
+add dx,[si - @copy + @ff6]
 dw 0xEA8B ; mov bp,dx
 push cs
 clc
@@ -134,8 +138,8 @@ movsw
 pop es
 push bp
 @write_ax:
-mov ax,ROWS_GAP*0x100
-add byte [si-@copy_end+@write_ax+0x2],ROWS_GAP
+lea ax,[si - @copy_end + 0x7000 + (ROWS_GAP * 0x100)]
+add byte [si-@copy_end+@write_ax+0x3],ROWS_GAP
 mov al,0xA7
 
 add word [bp + di - 0x2],JUMP_DIST - GAP - CALL_DIST
@@ -156,8 +160,7 @@ mov [si-@start+@reset_xchg+0x2],si
 dec di
 dw 0xEF8B ; mov bp,di
 mov cl,0x4
-cwd
-xchg bx,[SHARE_LOC]
+xchg bx,[SHARE_LOC_1]
 @bomb_sec:
 mov [0xC801],al
 mov [0xC501],al
@@ -285,11 +288,6 @@ mov word[si-@zomb_start+@zomb_jump],ZOMB_JUMP_OPCODE
 jmp @our_start
 
 @bottom_decoy:
-cwd
-cwd
-cbw
-cwd
-cwd
 nop
 xlatb
 xchg ah,al
@@ -334,15 +332,12 @@ nop
 xlatb
 xchg ah,al
 xlatb
-nop
 xlatb
 xchg ah,al
 xlatb
-nop
 xlatb
 xchg ah,al
 xlatb
-nop
 xlatb
 xchg ah,al
 xlatb

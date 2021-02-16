@@ -2,18 +2,19 @@
 %define CALL_AMOUNT 0x55
 %define GAP 0x19
 %define CALL_DIST (CALL_AMOUNT * (GAP - 0x4) - 0x4)
-%define MAGIC_SEG 0xFFA
 
-%define SHARE_LOC 0x8101
+%define SHARE_LOC 0xE1D4
+%define SHARE_LOC_1 0x8701
 
 %define ZOMB_WRITE_DIST 0x6C
 %define DX_INT_86 0xD7C4
-%define LB_ZOMB_START 0x176
-%define LB_WRITE_AX 0xB6
-%define LB_WRITE_SEG 0x8C
-%define LB_DIV_OFFSET 0x5
-%define LB_AX_LES_OFFSET 0x7
-%define LB_ADD_BP 0xB
+%define LB_ZOMB_START 0x17F
+; %define LB_WRITE_AX 0xB6
+%define LB_WRITE_SEG 0x8F
+%define LB_DIV_OFFSET 0x6
+%define LB_AX_LES_OFFSET 0x8
+%define LB_ADD_BP 0xC
+%define LB_FF6 0xE
 
 %define INT_87_AX 0xCCCC
 %define INT_87_DX 0xFFCC
@@ -26,14 +27,16 @@ jmp @our_start
 xlatb
 xchg ah,al
 xlatb
+xlatb
+xchg ah,al
+xlatb
 
 @our_start:
 xchg bx,[SHARE_LOC]
 dw 0xF08B ; mov si,ax
+dw 0xC38B ; mov ax,bx
 div word [bx + LB_DIV_OFFSET]
-add dx,0xFF6
-
-mov [bx+LB_WRITE_SEG+0x1],dx
+add dx,[bx + LB_FF6]
 
 mov cl,(@copy_end-@copy)/0x2 - 0x1
 dw 0xEA8B ; mov bp,dx
@@ -50,19 +53,19 @@ add di,@end
 push ss
 int 0x86
 
-lea ax,[si + JUMP_DIST - @copy]
-add [bx+LB_WRITE_AX+0x1],ax
+lea ax,[bx + 0x7000]
 
 dw 0xFF33 ; xor di,di
 pop es
 
 add word [bp+(@copy_end - @copy) - 0x2],JUMP_DIST - GAP - CALL_DIST
-mov word [bp + (@loop - @copy)],GAP
+mov byte [bp + (@loop - @copy)],GAP
 
 rep movsw
-push bp
+push cs
 movsw
 
+push bp
 mov al,0xA7
 
 xchg [bp],ax
@@ -74,7 +77,7 @@ mov [si-@copy_end+@write_al+0x4],bl
 dec di
 dw 0xEF8B ; mov bp,di
 lea bx,[si-@copy_end+@array]
-mov [SHARE_LOC],bx
+mov [SHARE_LOC_1],bx
 mov cl,0x4
 @bomb_sec:
 mov [0x4501],al
@@ -111,13 +114,12 @@ mov byte [bx - @array + @start],0x90
 inc bp
 mov cl,0x4
 dw 0xFD8B ; mov di,bp
-mov sp,0x7FE
+mov sp,0x7FC
 
 jnp @bomb_sec
 ;
 
 pop bx
-push cs
 dw 0xF633 ; xor si,si
 pop es
 push ss
@@ -169,6 +171,9 @@ dw (JUMP_DIST - (@loop_end - @loop) - 0x2 - 0x4)
 @copy_end:
 
 @bottom_decoy:
+xlatb
+xchg ah,al
+xlatb
 xlatb
 xchg ah,al
 xlatb

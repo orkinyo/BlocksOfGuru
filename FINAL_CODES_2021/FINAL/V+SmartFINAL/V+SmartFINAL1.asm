@@ -7,13 +7,13 @@
 %define ZOMB_WRITE_DIST 0x6C
 ;;
 ;; GENERAL DEFINES
-%define LB_ZOMBIE_LOOP 0x103
-%define LB_ZOMBIE_START 0x2D
+%define LB_ZOMBIE_LOOP 0x104
+%define LB_ZOMBIE_START 0x2F
 ; %define LB_WRITE_AX 0x45
-%define LB_ADD_XCHG 0x115
-%define LB_RESET_XCHG 0x11C
-%define LB_DIV_OFFSET 0x27
-%define LB_AX_LES_OFFSET 0x29
+%define LB_ADD_XCHG 0x116
+%define LB_RESET_XCHG 0x11D
+%define LB_DIV_OFFSET 0x29
+%define LB_AX_LES_OFFSET 0x2B
 
 %define SHARE_LOC 0xE129
 %define SHARE_LOC_1 0x8701
@@ -168,9 +168,9 @@ rep movsw
 @loop:
 mov cl,(@loop_end - @loop)/0x2
 add di,[si]
-add [bx],dx
 lea sp,[di+bx]
 dw 0xF633 ; xor si,si
+add [bx+si],dx
 movsw
 movsw
 dw 0xFD2B ; sub di,bp

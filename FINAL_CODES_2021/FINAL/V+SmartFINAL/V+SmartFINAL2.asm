@@ -16,7 +16,7 @@
 ;;
 ;; ZOMBIE DEFINES
 %define ZOMB_WRITE_DIST 0x6C
-%define ZOMB_SEG_DIFF 0x5
+%define ZOMB_SEG_DIFF 0x4
 %define ZOMB_INT_87_AX 0x86D7
 %define ZOMB_INT_87_DX 0xD7C4
 %define CALL_DI_SHL_BYTE 0xFFE2
@@ -52,9 +52,11 @@ nop
 xlatb
 xchg ah,al
 xlatb
+nop
 xlatb
 xchg ah,al
 xlatb
+nop
 xlatb
 xchg ah,al
 xlatb
@@ -171,12 +173,13 @@ mov si,ss
 lea si,[bx+si+0x4]
 xchg ax,si
 
+push ax
+mov di,INIT_SI + @copy_end - @copy - SI_PART1
 push si ; for end
 
-mov di,INIT_SI + @copy_end - @copy - SI_PART1
+lea dx,[si - @copy_end + JUMP_DIST]
 mov es,ax
 
-lea dx,[si - @copy_end + JUMP_DIST]
 mov cl,CL_PART1
 
 mov dl,((DIST_CALC - SAFETY_GAP)%(0x100)) + DX_OFFSET - 0x10
@@ -184,9 +187,8 @@ rep movsw
 
 
 ;; zombie section
-mov bp,0x8201
 mov cl,0x4
-dw 0xFD8B ; mov di,bp
+dw 0xEF8B ; mov bp,di
 lea bx,[si - @copy_end + @zombie_start]
 mov [si - @copy_end + @write_ah + 0x3],bh
 mov [si - @copy_end + @write_al + 0x4],bl
@@ -204,10 +206,10 @@ mov [0xC201],al
 mov [0xC301],al
 
 @xchg:
-xchg sp,[di - 0x1]
-xchg dx,[di + 0x200 - 0x1]
-xchg si,[di + 0x400 - 0x1]
-xchg ax,[di + 0x600 - 0x1]
+xchg sp,[di + 0x8200 - 0xBA]
+xchg dx,[di + 0x8400 - 0xBA]
+xchg si,[di + 0x8600 - 0xBA]
+xchg ax,[di + 0x8800 - 0xBA]
 
 @zombie_loop:
 xchg ax,ax
@@ -231,9 +233,9 @@ inc bp
 mov cl,0x4
 dw 0xFD8B ; mov di,bp
 
-mov sp,0x7FC ; for end
+mov sp,0x7FA ; for end
 
-jnp @bomb_again
+jp @bomb_again
 
 
 ;; zombie section end
@@ -242,7 +244,6 @@ pop bx ; for end
 mov cl,CL_PART2
 pop si ; for end
 
-push es
 mov di,INIT_SI
 push cs
 add si,SI_PART1 - @copy_end + @copy
@@ -356,9 +357,9 @@ rep movsw
 @cf_loop:
 mov cl,(@cf_loop_end - @cf_loop)/0x2
 add di,[si]
-add [bx],dx
 add sp,[bx+si]
 dw 0xF633 ; xor si,si
+add [bx+si],dx
 movsw
 movsw
 sub di,[bx+si]

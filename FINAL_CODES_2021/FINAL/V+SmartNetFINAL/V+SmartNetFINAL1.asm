@@ -70,7 +70,7 @@ dw 0xFF33 ; xor di,di
 push cs
 push ss
 
-lea ax,[si + JUMP_DIST - @copy_end]
+lea ax,[si + JUMP_DIST]
 
 push ss
 add si,@copy
@@ -171,9 +171,9 @@ rep movsw
 @loop:
 mov cl,(@loop_end - @loop)/0x2
 add di,[si]
-add [bx],dx
 lea sp,[di+bx]
 dw 0xF633 ; xor si,si
+add [bx+si],dx
 movsw
 movsw
 dw 0xFD2B ; sub di,bp

@@ -365,9 +365,9 @@ rep movsw
 @cf_loop:
 mov cl,(@cf_loop_end - @cf_loop)/0x2
 add di,[si]
-add [bx],dx
 add sp,[bx+si]
 dw 0xF633 ; xor si,si
+add [bx+si],dx
 movsw
 movsw
 sub di,[bx+si]
