@@ -37,28 +37,22 @@ dw AX_INT_86
 dw 0x1000
 
 @jds:
-; db 0x27
-; db 0x4B
-; db 0x52
-; db 0x5E
-; db 0x64
-; db 0xD3
-; db 0xEE
-; db 0x52
-
+db 0x27
+db 0x4B
 db 0x52
-db 0x52
-db 0x52
-db 0x52
-db 0x52
-db 0x52
-db 0x52
+db 0x5E
+db 0x64
+db 0xD3
+db 0xEE
 db 0x52
 
 @ff6:
 dw 0xFF6
 
 @top_decoy:
+cwd
+sub di,[bx+si]
+call far [bx]
 sub di,[bx+si]
 call far [bx]
 sub di,[bx+si]
@@ -141,14 +135,11 @@ mov [si+@write_al+0x4],bl
 push ss
 mov cl,0x4
 
-mov bx,si
+dw 0xDE8B ; mov bx,si
 and bx,0x7
 mov bl,[si + bx + @jds]
 mov [si + @write_jd + 0x2],bl
 
-; @write_seg:
-;add word dx,0x0001
-;dd 0x0001C281
 div word [si + @div_offset]
 @write_seg:
 add dx,[si + @ff6]
@@ -169,7 +160,7 @@ mov al,0xA2
 xchg [bp],ax
 
 @zomb_jump:
-xor di,di
+dw 0xFF33 ; xor di,di
 
 @bomb_loop:
 mov [di + BEAT3_LOC_1 + 0x100],bp
@@ -208,7 +199,7 @@ xchg ax,[di + BEAT3_LOC_2 - 0x700]
 xlatb
 xchg ah,al
 xlatb
-xor ah,al
+dw 0xE032 ; xor ah,al
 xchg ax,si
 @write_ah:
 mov word [si + ZOMB_WRITE_DIST + 0x2],0xFFCC
@@ -217,17 +208,18 @@ mov word [si + ZOMB_WRITE_DIST],0xCCB9
 add di,0x200
 loop @zomb_loop
 
-mov bx,bp
-xor bp,bp
+dw 0xDD8B ; mov bx,bp
+dw 0xED33 ; xor bp,bp
 pop si
 jmp @skip_zomb_counter
 ;;;;;;;;;;;;
 
 @zomb_land:
-mov bx,bp
+dw 0xDD8B ; mov bx,bp
 mov bp,0x8000 + ZOMB_COUNTER
 @skip_zomb_counter:
 mov ax,INT_87_AX
+add si,@copy
 mov dx,INT_87_DX
 int 0x87
 
@@ -236,21 +228,18 @@ int 0x86
 mov di,[CALL_DI_LOOP_WORD]
 int 0x86
 
-add si,@copy
 pop es
 
-xor di,di
+dw 0xFF33 ; xor di,di
 mov cl,(@copy_end - @copy)/0x2
+push ss
 rep movsw
 movsb
-
-push ss
 
 @write_jd:
 mov dx,JUMP_DIST
 pop ds
 
-; dw 0xC38B ; mov ax,bx
 mov ax,0xA4A5
 
 push cs
@@ -276,9 +265,9 @@ sub di,[bx+si]
 call far [bx]
 
 @copy:
-db 0x69
+db 0x63
 call far [bx]
-db 0x69
+db 0x65
 
 @loader:
 movsw
@@ -287,16 +276,15 @@ rep movsw
 @loop:
 mov cl,(@loop_end - @loop)/0x2
 add di,[si]
-add [bx],dx
 lea sp,[di+bx]
 dw 0xF633 ; xor si,si
+add [bx+si],dx
 movsw
 movsw
 sub di,[bx+si]
 dec bp
 db 0x78
-db 0xFF
-db 0x1F
+call far [bx]
 @loop_end:
 dw (-(@loop_end - @loader) - 0x2)
 dw (-(@loop_end - @loader) - 0x2 - 0x4)

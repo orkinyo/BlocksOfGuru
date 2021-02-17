@@ -142,7 +142,7 @@ rcr bp,cl
 add bp,CALL_DIST + 0x1
 mov [bp + 0x2],dx
 
-mov bx,si
+dw 0xDE8B ; mov bx,si
 and bx,0x7
 mov dl,[bx + si - @copy + @jds]
 mov [si + @write_jd - @copy + 0x2],dl 
@@ -162,9 +162,8 @@ dw 0xF633 ; xor si,si
 push bp
 
 push cs
-pop es
-
 mov cl,0x4
+pop es
 
 ;;;;;;;;;;;;
 @zomb_jump:

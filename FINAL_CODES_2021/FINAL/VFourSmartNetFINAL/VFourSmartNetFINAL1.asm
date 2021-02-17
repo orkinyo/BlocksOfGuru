@@ -6,11 +6,11 @@
 %define ZOMB_WRITE_DIST 0x6C
 
 %define LB_DIV_OFFSET 0x5
-%define LB_ZOMB_START 0x17A
+%define LB_ZOMB_START 0x17F
 %define LB_AX_LES_OFFSET 0x7
-%define LB_WRITE_AX 0xAD
-%define LB_WRITE_SEG 0x97
-%define LB_WRITE_JD 0x139
+%define LB_WRITE_AX 0xB2
+%define LB_WRITE_SEG 0x9C
+%define LB_WRITE_JD 0x13E
 %define LB_FF6 0x13
 
 %define INT_86_DX 0xD7E0
@@ -34,7 +34,7 @@ xlatb
 @our_start:
 xchg bx,[SHARE_LOC]
 dw 0xF08B ; mov si,ax 
-mov ax,bx
+dw 0xC38B ; mov ax,bx
 div word [bx + LB_DIV_OFFSET]
 add dx,[bx + LB_FF6]
 ; add [bx + LB_WRITE_SEG + 0x2],dx
@@ -71,16 +71,17 @@ mov al,0xA2
 
 xchg [bp],ax
 push word [bx - LB_ZOMB_START + LB_WRITE_JD + 0x1]
-push bp
+push ss
 
 ;;;;;;;;;;;;
 
 mov [si-@copy_end-0x2+@write_ah+0x3],bh
 mov [si-@copy_end-0x2+@write_al+0x4],bl
+push bp
 dw 0xEF8B ; mov bp,di
 mov cl,0x4
 lea bx,[si-@copy_end-0x2+@array]
-cwd 
+dw 0xF633 ; xor si,si
 mov [SHARE_LOC_1],bx
 
 @bomb_again:
@@ -119,7 +120,7 @@ inc bp
 mov cl,0x4
 dw 0xFD8B ; mov di,bp
 
-mov sp,0x7FC
+mov sp,0x7FA
 
 jp @bomb_again
 
@@ -128,7 +129,6 @@ jp @bomb_again
 
 pop bx
 
-push ss
 dw 0xED33 ; xor bp,bp
 pop ds
 
@@ -151,11 +151,8 @@ push cs
 les di,[bx+si]
 pop ss
 dec di
-lea sp,[bx+di]
-
-
-; dw 0xC38B ; mov ax,bx
 mov ax,0xA4A5
+lea sp,[bx+di]
 
 movsw
 movsw
@@ -166,9 +163,9 @@ sub di,[bx+si]
 call far [bx]
 
 @copy:
-db 0x69
+db 0x61
 call far [bx]
-db 0x69
+db 0x62
 
 @loader:
 movsw
@@ -177,9 +174,9 @@ rep movsw
 @loop:
 mov cl,(@loop_end - @loop)/0x2
 add di,[si]
-add [bx],dx
 lea sp,[di+bx]
 dw 0xF633 ; xor si,si
+add [bx+si],dx
 movsw
 movsw
 sub di,[bx+si]
