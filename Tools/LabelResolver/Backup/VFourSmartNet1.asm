@@ -29,7 +29,7 @@ mov [SHARE_LOC],ax
 jmp @our_start
 
 @div_offset:
-db 0xE
+db 0xF
 db 0x0
 
 @ax_les_offset:
@@ -37,14 +37,26 @@ dw AX_INT_86
 dw 0x1000
 
 @jds:
-db 0x27
-db 0x4B
+; db 0x27
+; db 0x4B
+; db 0x52
+; db 0x5E
+; db 0x64
+; db 0xD3
+; db 0xEE
+; db 0x52
+
 db 0x52
-db 0x5E
-db 0x64
-db 0xD3
-db 0xEE
-db 0xF6
+db 0x52
+db 0x52
+db 0x52
+db 0x52
+db 0x52
+db 0x52
+db 0x52
+
+@ff6:
+dw 0xFF6
 
 @top_decoy:
 sub di,[bx+si]
@@ -119,6 +131,7 @@ add [bx],dx
 
 @our_start:
 dw 0xF08B ; mov si,ax
+inc ax
 
 lea bx,[si+@zomb_start]
 mov [si+@write_ah+0x3],bh
@@ -133,23 +146,25 @@ and bx,0x7
 mov bl,[si + bx + @jds]
 mov [si + @write_jd + 0x2],bl
 
-@write_seg:
+; @write_seg:
 ;add word dx,0x0001
-dd 0x0001C281
+;dd 0x0001C281
+div word [si + @div_offset]
+@write_seg:
+add dx,[si + @ff6]
+
 dw 0xEA03 ; add bp,dx
 shl bp,cl
 add bp,CALL_DIST + 0x1
 mov [bp + 0x2],dx
 
 push cs
-mov ax,INT_87_AX
 pop es
-mov dx,INT_87_DX
-int 0x87
 
-add byte [si + @write_ax + 0x2],(ROWS_GAP+0x3)
+add byte [si + @write_ax + 0x3],(ROWS_GAP+0x3)
 @write_ax:
-mov ax,0x00A2
+lea ax,[si + 0x7000]
+mov al,0xA2
 
 xchg [bp],ax
 
@@ -212,6 +227,10 @@ jmp @skip_zomb_counter
 mov bx,bp
 mov bp,0x8000 + ZOMB_COUNTER
 @skip_zomb_counter:
+mov ax,INT_87_AX
+mov dx,INT_87_DX
+int 0x87
+
 mov di,[CALL_DI_SHL_WORD]
 int 0x86
 mov di,[CALL_DI_LOOP_WORD]
@@ -232,9 +251,11 @@ mov dx,JUMP_DIST
 pop ds
 
 ; dw 0xC38B ; mov ax,bx
+mov ax,0xA4A5
 
 push cs
 
+add [di - 0x3],dh
 add [di - 0x1],dh
 
 les di,[bx]
@@ -278,11 +299,12 @@ db 0xFF
 db 0x1F
 @loop_end:
 dw (-(@loop_end - @loader) - 0x2)
+dw (-(@loop_end - @loader) - 0x2 - 0x4)
 @copy_end:
 @db_1:
 db 0x1
 @seg_diff:
-db 0x1
+dw 0x0002
 @zomb_start:
 xchg si,cx
 
@@ -296,17 +318,8 @@ jnz @wait
 
 xchg dl,[si - @zomb_start + @db_1]
 
-mov dl,[si - @zomb_start + @seg_diff]
+add ax,[si - @zomb_start + @seg_diff]
 inc byte [si - @zomb_start + @seg_diff]
-add dx,[si - @zomb_start + @write_seg + 0x2]
-
-cmp dx,0x1005
-jb @skip_seg_change
-
-sub dx,0xF
-
-@skip_seg_change:
-sub dx,[si - @zomb_start + @write_seg + 0x2]
 
 mov word [si - @zomb_start + @zomb_jump],ZOMB_JUMP_OPCODE
 add si,(-@zomb_start)
