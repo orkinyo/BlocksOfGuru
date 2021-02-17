@@ -36,32 +36,30 @@ db 0x0
 dw AX_INT_86
 dw 0x1000
 
+@jds:
+db 0x27
+db 0x4B
+db 0x52
+db 0x5E
+db 0x64
+db 0xD3
+db 0xEE
+db 0xF6
+
 @top_decoy:
-cwd
-cbw
-cwd
-sub di,[bx+si]
-call far [bx]
-sub di,[bx+si]
-call far [bx]
 sub di,[bx+si]
 call far [bx]
 sub di,[bx+si]
 call far [bx]
 
-movsb
 movsw
 rep movsw
-movsb
 movsw
 rep movsw
-movsb
 movsw
 rep movsw
-movsb
 movsw
 rep movsw
-movsb
 movsw
 rep movsw
 
@@ -130,6 +128,10 @@ mov [si+@write_al+0x4],bl
 push ss
 mov cl,0x4
 
+mov bx,si
+and bx,0x7
+mov bl,[si + bx + @jds]
+mov [si + @write_jd + 0x2],bl
 
 @write_seg:
 ;add word dx,0x0001
@@ -144,11 +146,6 @@ mov ax,INT_87_AX
 pop es
 mov dx,INT_87_DX
 int 0x87
-
-mov di,[CALL_DI_SHL_WORD]
-int 0x86
-mov di,[CALL_DI_LOOP_WORD]
-int 0x86
 
 add byte [si + @write_ax + 0x2],(ROWS_GAP+0x3)
 @write_ax:
@@ -215,21 +212,30 @@ jmp @skip_zomb_counter
 mov bx,bp
 mov bp,0x8000 + ZOMB_COUNTER
 @skip_zomb_counter:
+mov di,[CALL_DI_SHL_WORD]
+int 0x86
+mov di,[CALL_DI_LOOP_WORD]
+int 0x86
+
 add si,@copy
 pop es
 
 xor di,di
 mov cl,(@copy_end - @copy)/0x2
 rep movsw
+movsb
 
 push ss
 
+@write_jd:
 mov dx,JUMP_DIST
 pop ds
 
-dw 0xC38B ; mov ax,bx
+; dw 0xC38B ; mov ax,bx
 
 push cs
+
+add [di - 0x1],dh
 
 les di,[bx]
 pop ss
@@ -254,7 +260,6 @@ call far [bx]
 db 0x69
 
 @loader:
-movsb
 movsw
 rep movsw
 
@@ -272,7 +277,7 @@ db 0x78
 db 0xFF
 db 0x1F
 @loop_end:
-dw (JUMP_DIST - (@loop_end - @loader) - 0x2)
+dw (-(@loop_end - @loader) - 0x2)
 @copy_end:
 @db_1:
 db 0x1
@@ -319,24 +324,15 @@ sub di,[bx+si]
 call far [bx]
 sub di,[bx+si]
 call far [bx]
-sub di,[bx+si]
-call far [bx]
-sub di,[bx+si]
-call far [bx]
 
-movsb
 movsw
 rep movsw
-movsb
 movsw
 rep movsw
-movsb
 movsw
 rep movsw
-movsb
 movsw
 rep movsw
-movsb
 movsw
 rep movsw
 

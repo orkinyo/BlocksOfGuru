@@ -6,10 +6,11 @@
 %define ZOMB_WRITE_DIST 0x6C
 
 %define LB_DIV_OFFSET 0x5
-%define LB_ZOMB_START 0x161
+%define LB_ZOMB_START 0x167
 %define LB_AX_LES_OFFSET 0x7
-%define LB_WRITE_AX 0xB5
-%define LB_WRITE_SEG 0x8B
+%define LB_WRITE_AX 0xAE
+%define LB_WRITE_SEG 0x90
+%define LB_WRITE_JD 0x12F
 
 %define INT_86_DX 0xD7E0
 
@@ -22,14 +23,12 @@
 jmp @our_start
 
 @top_decoy:
-cwd
 xlatb
 xchg ah,al
 xlatb
 xlatb
 xchg ah,al
 xlatb
-cwd
 
 @our_start:
 xchg bx,[SHARE_LOC]
@@ -38,7 +37,7 @@ div word [bx + LB_DIV_OFFSET]
 add dx,0xFF6
 add [bx + LB_WRITE_SEG + 0x2],dx
 
-mov cl,(@copy_end - @copy)/0x2 - 0x1
+mov cl,(@copy_end - @copy)/0x2
 
 dw 0xEA8B ; mov bp,dx
 rcr bp,cl
@@ -62,24 +61,24 @@ lea ax,[si + JUMP_DIST - @copy]
 add [bx + LB_WRITE_AX + 0x2],ah
 
 rep movsw
-movsw
+movsb
 
 add bx,LB_ZOMB_START
 mov al,0xA2
 
 xchg [bp],ax
+push word [bx - LB_ZOMB_START + LB_WRITE_JD + 0x1]
 push bp
 
 ;;;;;;;;;;;;
 
 mov [si-@copy_end+@write_ah+0x3],bh
 mov [si-@copy_end+@write_al+0x4],bl
-dec di
+cwd
 dw 0xEF8B ; mov bp,di
 mov cl,0x4
 lea bx,[si-@copy_end+@array]
-cwd
-cwd
+cwd 
 mov [SHARE_LOC_1],bx
 
 @bomb_again:
@@ -118,7 +117,7 @@ inc bp
 mov cl,0x4
 dw 0xFD8B ; mov di,bp
 
-mov sp,0x7FE
+mov sp,0x7FC
 
 jnp @bomb_again
 
@@ -134,24 +133,25 @@ pop ds
 push cs
 
 dw 0xF633 ; xor si,si
-pop ss
-mov cl,(@loop_end - @loop)/0x2
-mov ax,INT_87_AX
-
-push cs
-mov dx,INT_87_DX
 pop es
+mov ax,INT_87_AX
+mov cl,(@loop_end - @loop)/0x2
+mov dx,INT_87_DX
 
 int 0x87
 
-mov dx,JUMP_DIST
+pop dx
+add [si + (@loop_end - @copy) + 0x1],dh
+
+push cs
 
 les di,[bx+si]
+pop ss
 dec di
 lea sp,[bx+di]
 
 
-dw 0xC38B ; mov ax,bx
+; dw 0xC38B ; mov ax,bx
 
 movsw
 movsw
@@ -167,7 +167,6 @@ call far [bx]
 db 0x69
 
 @loader:
-movsb
 movsw
 rep movsw
 
@@ -184,7 +183,7 @@ dec bp
 db 0x78
 call far [bx]
 @loop_end:
-dw (JUMP_DIST - (@loop_end - @loader) - 0x2)
+dw (-(@loop_end - @loader) - 0x2)
 @copy_end:
 
 
