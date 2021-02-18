@@ -13,6 +13,7 @@
 %define CL_PART1 0x6
 %define CL_PART2 ((@copy_end - @copy)/0x2 - CL_PART1)
 %define SI_PART1 (CL_PART1*0x2)
+%define DI_DELTA (INIT_SI+@copy_end-@copy)
 ;;
 ;; ZOMBIE DEFINES
 %define ZOMB_WRITE_DIST 0x6C
@@ -198,10 +199,10 @@ mov [si - @copy_end + @write_al + 0x4],bl
 
 ;;;;;;;;;
 @bomb_loop:
-mov [di + BEAT3_LOC_1 - 0xBB + 0x100],bp
-mov [di + BEAT3_LOC_2 - 0xBB + 0x100],bp
-mov [di + BEAT3_LOC_3 - 0xBB + 0x100],bp
-mov [di + BEAT3_LOC_4 - 0xBB + 0x100],bp
+mov [di + BEAT3_LOC_1 - DI_DELTA + 0x100],bp
+mov [di + BEAT3_LOC_2 - DI_DELTA + 0x100],bp
+mov [di + BEAT3_LOC_3 - DI_DELTA + 0x100],bp
+mov [di + BEAT3_LOC_4 - DI_DELTA + 0x100],bp
 add di,0x200
 loop @bomb_loop
 
@@ -212,17 +213,17 @@ push es
 push si ; for end
 
 @zomb_loop:
-xchg ax,[di + BEAT3_LOC_1 - 0x800 - 0xBB + 0x100]
-cmp ax,[di + BEAT3_LOC_2 - 0x800 - 0xBB + 0x100]
+xchg ax,[di + BEAT3_LOC_1 - 0x800 - DI_DELTA + 0x100]
+cmp ax,[di + BEAT3_LOC_2 - 0x800 - DI_DELTA + 0x100]
 jnz @1_or_2
 
 @3_or_4:
-xchg ax,[di + BEAT3_LOC_3 - 0x800 - 0xBB + 0x100]
+xchg ax,[di + BEAT3_LOC_3 - 0x800 - DI_DELTA + 0x100]
 cmp ax,bp
 jnz @catch
 
 @4:
-xchg ax,[di + BEAT3_LOC_4 - 0x800 - 0xBB + 0x100]
+xchg ax,[di + BEAT3_LOC_4 - 0x800 - DI_DELTA + 0x100]
 jmp @catch
 
 @1_or_2:
@@ -230,7 +231,7 @@ cmp ax,bp
 jnz @catch
 
 @2:
-xchg ax,[di + BEAT3_LOC_2 - 0x800 - 0xBB + 0x100]
+xchg ax,[di + BEAT3_LOC_2 - 0x800 - DI_DELTA + 0x100]
 
 @catch:
 xlatb
