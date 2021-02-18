@@ -179,7 +179,7 @@ xchg ax,si
 mov di,INIT_SI + @copy_end - @copy - SI_PART1
 mov es,ax
 
-lea dx,[si - @copy_end + JUMP_DIST]
+lea dx,[si - @copy_end + SI_PART1 + JUMP_DIST]
 mov cl,CL_PART1
 
 mov dl,((DIST_CALC - SAFETY_GAP)%(0x100)) + DX_OFFSET - 0x10
