@@ -10,7 +10,7 @@
 %define DIST_CALC (0xA2 + 0x4*0x4 -((@main_loop_end - @copy) + BOTTOM_TRAP_DIST))
 %define SAFETY_GAP 0x10
 %define DX_OFFSET (0x2-0x11)
-%define CL_PART1 0x6
+%define CL_PART1 0x7
 %define CL_PART2 ((@copy_end - @copy)/0x2 - CL_PART1)
 %define SI_PART1 (CL_PART1*0x2)
 %define DI_DELTA (INIT_SI+@copy_end-@copy)
@@ -155,7 +155,7 @@ mov bp,0x8000+ZOMBIE_COUNTER
 dec di
 
 lea sp,[di+bx]
-mov word [bx + (@cf_loop_end - @cf_copy)],(CF_JUMP_DIST + CALL_DIST)
+mov word [bx + si + (@cf_loop_end - @cf_copy)],(CF_JUMP_DIST + CALL_DIST)
 
 movsw
 movsw
@@ -176,7 +176,7 @@ add bx,0x14
 xchg ax,si
 
 mov di,INIT_SI + @copy_end - @copy - SI_PART1
-mov es,bx
+mov es,bx   
 
 lea dx,[si - @copy_end + SI_PART1 + JUMP_DIST]
 mov cl,CL_PART1

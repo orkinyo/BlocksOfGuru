@@ -155,7 +155,7 @@ mov bp,0x8000+ZOMBIE_COUNTER
 dec di
 
 lea sp,[di+bx]
-mov word [bx + (@cf_loop_end - @cf_copy)],(CF_JUMP_DIST + CALL_DIST)
+mov word [bx + si + (@cf_loop_end - @cf_copy)],(CF_JUMP_DIST + CALL_DIST)
 
 movsw
 movsw
