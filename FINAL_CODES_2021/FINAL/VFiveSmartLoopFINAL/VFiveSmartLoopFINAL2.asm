@@ -1,4 +1,4 @@
-%define JUMP_DIST 0xF900
+%define JUMP_DIST 0x5100
 %define CALL_AMOUNT 0x55
 %define GAP 0x19
 %define CALL_DIST (CALL_AMOUNT * (GAP - 0x4) - 0x4)
