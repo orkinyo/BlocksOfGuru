@@ -270,7 +270,8 @@ add bx,(@main_loop - @copy - TOP_TRAP_DIST - 0x2)
 
 mov si,(INIT_SI + @reset_main_loop - @copy - 0x2)
 
-mov [@main_loop_end - @copy + INIT_SI + 0x8],ds
+;mov [@main_loop_end - @copy + INIT_SI + 0x8],ds
+mov [si + @main_loop_end - @reset_main_loop + 0x8 + 0x2],ds
 push cs
 
 mov cl,((@main_loop_end - @reset_main_loop)/0x2)
