@@ -171,13 +171,12 @@ call far [bx]
 @our_start:
 add ax,@copy_end - SI_PART1
 mov bx,ss
-and bx,0x10
-mov si,ss
-lea si,[bx+si+0x4]
+or bx,0x10
+add bx,0x14
 xchg ax,si
 
 mov di,INIT_SI + @copy_end - @copy - SI_PART1
-mov es,ax
+mov es,bx
 
 lea dx,[si - @copy_end + SI_PART1 + JUMP_DIST]
 mov cl,CL_PART1
@@ -270,7 +269,8 @@ add bx,(@main_loop - @copy - TOP_TRAP_DIST - 0x2)
 
 mov si,(INIT_SI + @reset_main_loop - @copy - 0x2)
 
-mov [@main_loop_end - @copy + INIT_SI + 0x8],ds
+;mov [@main_loop_end - @copy + INIT_SI + 0x8],ds
+mov [si + @main_loop_end - @reset_main_loop + 0x8 + 0x2],ds
 push cs
 
 mov cl,((@main_loop_end - @reset_main_loop)/0x2)

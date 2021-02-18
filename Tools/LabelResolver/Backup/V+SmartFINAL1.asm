@@ -10,7 +10,7 @@
 %define DIST_CALC (0xA2 + 0x4*0x4 -((@main_loop_end - @copy) + BOTTOM_TRAP_DIST))
 %define SAFETY_GAP 0x10
 %define DX_OFFSET (0x2-0x11)
-%define CL_PART1 0x1A
+%define CL_PART1 0x1B
 %define CL_PART2 ((@copy_end - @copy)/0x2 - CL_PART1)
 %define SI_PART1 (CL_PART1*0x2)
 ;;
@@ -168,17 +168,16 @@ call far [bx]
 @our_start:
 add ax,@copy_end - SI_PART1
 mov bx,ss
-and bx,0x10
-mov si,ss
-lea si,[bx+si+0x4]
+or bx,0x10
+add bx,0x14 
 xchg ax,si
 
-push ax
+push bx
 mov di,INIT_SI + @copy_end - @copy - SI_PART1
 push si ; for end
 
 lea dx,[si - @copy_end + JUMP_DIST]
-mov es,ax
+mov es,bx
 
 mov cl,CL_PART1
 
@@ -261,7 +260,8 @@ add bx,(@main_loop - @copy - TOP_TRAP_DIST - 0x2)
 
 mov si,(INIT_SI + @reset_main_loop - @copy - 0x2)
 
-mov [@main_loop_end - @copy + INIT_SI + 0x8],ds
+;mov [@main_loop_end - @copy + INIT_SI + 0x8],ds
+mov [si + @main_loop_end - @reset_main_loop + 0x8 + 0x2],ds
 push cs
 
 mov cl,((@main_loop_end - @reset_main_loop)/0x2)
