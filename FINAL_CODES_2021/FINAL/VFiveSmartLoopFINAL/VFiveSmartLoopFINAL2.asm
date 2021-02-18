@@ -1,4 +1,4 @@
-%define JUMP_DIST 0x5100
+%define JUMP_DIST 0xF900
 %define CALL_AMOUNT 0x55
 %define GAP 0x19
 %define CALL_DIST (CALL_AMOUNT * (GAP - 0x4) - 0x4)
@@ -33,7 +33,6 @@ dw 0x100
 dw 0xFF6
 
 @top_decoy:
-nop
 xlatb
 xchg ah,al
 xlatb
@@ -128,7 +127,6 @@ div word [si - @copy + @div_offset]
 add dx,[si - @copy + @ff6]
 dw 0xEA8B ; mov bp,dx
 push cs
-clc
 rcr bp,cl
 
 rep movsw
@@ -157,6 +155,7 @@ mov [si-@copy_end+@write_al+0x4],bl
 add si,@start-@copy_end
 mov [si-@start+@add_xchg+0x2],si
 mov [si-@start+@reset_xchg+0x2],si
+dw 0xF633 ; xor si,si
 dec di
 dw 0xEF8B ; mov bp,di
 mov cl,0x4
