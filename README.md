@@ -1,8 +1,5 @@
-# codegurubyteme
-![ByteMe](https://user-images.githubusercontent.com/60312438/85885047-58e83800-b7ec-11ea-858b-021ee2a639d1.jpg)
-### ByteMe CodeGuru FTW! <br><br><br>
---------------------------
+# The BlocksOfGuru repository for cgx 2021
+ 
+## cgx2021 [results](https://codeguru.co.il/Xtreme/winners.htm)
 
-
-![HackerTyper](https://user-images.githubusercontent.com/60312438/85885117-7c12e780-b7ec-11ea-8895-23b428239167.jpg)
-
+## Includes surviviors source code and many many custom tools
