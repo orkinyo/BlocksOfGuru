@@ -114,8 +114,8 @@ mov cx,0xA
 @zomb_jump:
 push es
 
-@fuck_michael:
-loop @fuck_michael
+@repppppppp:
+loop @repppppppp
 
 pop ds
 

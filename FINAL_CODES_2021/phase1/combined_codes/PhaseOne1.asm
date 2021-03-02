@@ -93,10 +93,10 @@ push es
 pop ds
 
 mov cx,0x3
-@fuck_michael:
+@reppppp:
 cbw
 cwd
-loop @fuck_michael
+loop @reppppp
 nop
 
 mov word [si-@copy_end+@write_nop],ZOMB_NOP_JUMP_OPCODE

@@ -43,7 +43,7 @@ public class BlockOfGuruEngine
 			return;
 		}
 			
-		if(args.length > 1 && args[0].equals("--fuck") && args[1].equals("--globi"))
+		if(args.length > 1 && args[0].equals("hail") && args[1].equals("--globi"))
 		{
 			System.out.println(credits);
 			return;
