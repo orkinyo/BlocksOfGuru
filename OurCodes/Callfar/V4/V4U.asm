@@ -1,9 +1,9 @@
 ;; Callfar V4 - Best in class
 
 %define jumpDist 0x2E00
-%define callAmount 0x80
+%define callFarAmount 0x80
 
-%define callDist 0x4 * callAmount											;;distance the callfar loop will bomb on the board
+%define callDist 0x4 * callFarAmount											;;distance the callfar loop will bomb on the board
 %define deltaSp jumpDist + callDist										;;the amount sp needs to updated for next loop
 %define deltaSp_loc @end_loop_section-@copy                          	;; the location in es where we store deltaSp (2 is for the 2 bytes of rep movsw)
 
